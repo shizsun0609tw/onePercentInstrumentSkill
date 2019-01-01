@@ -16,13 +16,13 @@ public class MidiHandler{
 	    private double second = 0.0;
 	    private long tick = 0;
 	    private int Channel = 0;
-	    private int on = 0;
+	    private Boolean on = false;
 	    private String name = "C4";
 	    private int key = 60;
 	    private int velocity = 127;
 	    private int bpm = 60;
 	    
-		public Note(int bpm, long tick, int Channel, int on, String name, int key, int velocity) {
+		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) {
 			second = (tick*60.0)/(bpm*1024);
 			this.tick = tick;
 			this.Channel = Channel;
@@ -38,7 +38,7 @@ public class MidiHandler{
 		public long getTick() {
 			return this.tick;
 		}
-		public int getSwitch() {
+		public Boolean getSwitch() {
 			return this.on;
 		}
 		public int getKey() {
@@ -76,12 +76,12 @@ public class MidiHandler{
                         int velocity = sm.getData2();
                         if(sm.getCommand() == NOTE_ON) {
                         	System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
-                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), 1, noteName + octave, key, velocity);
+                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), true, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         }
                         else if (sm.getCommand() == NOTE_OFF) {
                         	System.out.println("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
-                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), 0, noteName + octave, key, velocity);
+                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), false, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         } 
                         notes.add(tempNote);
