@@ -44,6 +44,9 @@ public class MidiHandler{
 		public int getKey() {
 			return this.key;
 		}
+		public String getName() {
+			return this.name;
+		}
 	}
 	private ArrayList<Note> notes = new ArrayList<Note>();
 	private Note lastNote;
@@ -75,12 +78,12 @@ public class MidiHandler{
                         String noteName = NOTE_NAMES[note];
                         int velocity = sm.getData2();
                         if(sm.getCommand() == NOTE_ON) {
-                        	System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
+                        	// System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), true, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         }
                         else if (sm.getCommand() == NOTE_OFF) {
-                        	System.out.println("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
+                        	// System.out.println("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), false, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         } 
@@ -112,6 +115,8 @@ public class MidiHandler{
 		try {
 			System.out.println(mh.getNote(5).getSecond());
 			System.out.println(mh.getLastSecond());
+			System.out.println(mh.getNote(5).getKey());
+			System.out.println(mh.getNote(5).getName());
 		}catch(Exception e) {
 			System.err.println(e);
 		}
