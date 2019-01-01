@@ -30,7 +30,7 @@ public class AudioEdit {
 			format = sounds[0].getFormat();
 			dataInfo = new DataLine.Info(SourceDataLine.class, format);
 			ausgabe=(SourceDataLine)AudioSystem.getLine(dataInfo);
-		} catch(UnsupportedAudioFileException | IOException | LineUnavailableException bug) {
+		} catch(Exception bug) {
 			System.err.println(bug);
 		}
 	}

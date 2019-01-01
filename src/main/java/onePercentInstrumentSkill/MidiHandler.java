@@ -115,7 +115,7 @@ public class MidiHandler{
 	*/
 	
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
-		MidiHandler mh = new MidiHandler("res/test_midi.midi", 120);
+		MidiHandler mh = new MidiHandler("src/main/resources/test_midi.midi", 120);
 		try {
 			System.out.println(mh.getNote(5).getKey());
 		}catch(Exception e) {
