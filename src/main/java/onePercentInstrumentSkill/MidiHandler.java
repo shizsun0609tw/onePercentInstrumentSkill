@@ -54,8 +54,12 @@ public class MidiHandler{
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    
+    public static final String[] NOTE_TABLE = new String[109];
 	public MidiHandler(String path, int bpm) throws InvalidMidiDataException, IOException {
+		for(int i = 0; i <= 108; i++) {
+			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
+			else NOTE_TABLE[i] = null;
+		}
 		Note tempNote = null;
 		Sequence sequence = MidiSystem.getSequence(new File(path));
         int trackNumber = 0;
