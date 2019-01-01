@@ -23,7 +23,7 @@ public class MidiHandler{
 	    private int bpm = 60;
 	    
 		public Note(int bpm, long tick, int Channel, int on, String name, int key, int velocity) {
-			second = (tick*60)/(bpm*1024);
+			second = (tick*60.0)/(bpm*1024);
 			this.tick = tick;
 			this.Channel = Channel;
 			this.on =on;
@@ -46,6 +46,8 @@ public class MidiHandler{
 		}
 	}
 	private ArrayList<Note> notes = new ArrayList<Note>();
+	private Note lastNote;
+	private double lastNoteSecond = 0.0;
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
@@ -75,10 +77,12 @@ public class MidiHandler{
                         if(sm.getCommand() == NOTE_ON) {
                         	System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), 1, noteName + octave, key, velocity);
+                        	lastNote = tempNote;
                         }
                         else if (sm.getCommand() == NOTE_OFF) {
                         	System.out.println("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), 0, noteName + octave, key, velocity);
+                        	lastNote = tempNote;
                         } 
                         notes.add(tempNote);
                     } else {
@@ -90,6 +94,10 @@ public class MidiHandler{
             }
             //System.out.println();
         }
+        lastNoteSecond = lastNote.getSecond();
+	}
+	public double getLastSecond() {
+		return lastNoteSecond;
 	}
 	public Note getNote(int index) throws IndexOutOfBoundsException{
 		try {
@@ -99,25 +107,11 @@ public class MidiHandler{
 			return null;
 		}
 	}
-	/*
-	public int getKey(int index) {
-		return notes.get(i).getKey();
-	}
-	public double getSecond(int i ) {
-		return notes.get(i).getSecond();
-	}
-	public long getTick(int i) {
-		return notes.get(i).getTick();
-	}
-	public int getSwitch(int i) {
-		return notes.get(i).getSwitch();
-	}
-	*/
-	
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
 		MidiHandler mh = new MidiHandler("src/main/resources/test_midi.midi", 120);
 		try {
-			System.out.println(mh.getNote(5).getKey());
+			System.out.println(mh.getNote(5).getSecond());
+			System.out.println(mh.getLastSecond());
 		}catch(Exception e) {
 			System.err.println(e);
 		}
