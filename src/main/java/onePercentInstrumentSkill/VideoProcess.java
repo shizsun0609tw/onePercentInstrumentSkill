@@ -49,6 +49,7 @@ public class VideoProcess {
 		getFrame();
 		combineFrame();
 		generateVideo();
+		System.out.println("Success!");
 	}
 	
 	// get file from path
