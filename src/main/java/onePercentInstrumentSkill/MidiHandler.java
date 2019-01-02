@@ -51,12 +51,13 @@ public class MidiHandler{
 	private ArrayList<Note> notes = new ArrayList<Note>();
 	private Note lastNote;
 	private double lastNoteSecond = 0.0;
+	private int size = 0;
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    public static final String[] NOTE_TABLE = new String[109];
+    public static final String[] NOTE_TABLE = new String[128];
 	public MidiHandler(String path, int bpm) throws InvalidMidiDataException, IOException {
-		for(int i = 0; i <= 108; i++) {
+		for(int i = 0; i <= 127; i++) {
 			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
 			else NOTE_TABLE[i] = null;
 		}
@@ -102,6 +103,7 @@ public class MidiHandler{
             //System.out.println();
         }
         lastNoteSecond = lastNote.getSecond();
+        size = notes.size();
 	}
 	public double getLastSecond() {
 		return lastNoteSecond;
@@ -114,13 +116,19 @@ public class MidiHandler{
 			return null;
 		}
 	}
+	public int getSize() {
+		return size;
+	}
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
-		MidiHandler mh = new MidiHandler("src/main/resources/test_midi.midi", 120);
+		MidiHandler mh = new MidiHandler("src/main/resources/test.midi", 120);
+		int maxkey = 0;
 		try {
-			System.out.println(mh.getNote(5).getSecond());
-			System.out.println(mh.getLastSecond());
-			System.out.println(mh.getNote(5).getKey());
-			System.out.println(mh.getNote(5).getName());
+			for(int i = 0; i < mh.getSize(); i++) {
+				System.out.println(i+", Note: "+mh.getNote(i).getName()+", on/off: "+mh.getNote(i).getSwitch()+", @Second: "+mh.getNote(i).getSecond());
+				if(mh.getNote(i).getKey() > maxkey){maxkey = mh.getNote(i).getKey();}
+				System.out.println(maxkey);
+			}
+
 		}catch(Exception e) {
 			System.err.println(e);
 		}
