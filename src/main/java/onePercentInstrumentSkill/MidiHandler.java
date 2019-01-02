@@ -23,7 +23,8 @@ public class MidiHandler{
 	    private int bpm = 60;
 	    
 		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) {
-			second = (tick*60.0)/(bpm*1024);
+			second = (tick*60.0)/(bpm*480);
+			System.out.println("tick: "+ tick);
 			this.tick = tick;
 			this.Channel = Channel;
 			this.on =on;
@@ -120,13 +121,13 @@ public class MidiHandler{
 		return size;
 	}
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
-		MidiHandler mh = new MidiHandler("src/main/resources/test.midi", 120);
+		MidiHandler mh = new MidiHandler("src/test/resources/video_test_midi.midi", 120);
 		int maxkey = 0;
 		try {
 			for(int i = 0; i < mh.getSize(); i++) {
 				System.out.println(i+", Note: "+mh.getNote(i).getName()+", on/off: "+mh.getNote(i).getSwitch()+", @Second: "+mh.getNote(i).getSecond());
 				if(mh.getNote(i).getKey() > maxkey){maxkey = mh.getNote(i).getKey();}
-				System.out.println(maxkey);
+				System.out.println(mh.getLastSecond());
 			}
 
 		}catch(Exception e) {
