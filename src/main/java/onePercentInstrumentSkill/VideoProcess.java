@@ -74,7 +74,7 @@ public class VideoProcess {
 			try {
 				if(exist(MidiHandler.NOTE_TABLE[i])) {
 					File temp = new File(myFolderPath + "/" + MidiHandler.NOTE_TABLE[i] + ".mp4");
-					if(temp.exists())fileList.add(temp);
+					if(temp.exists()) fileList.add(temp);
 					else {
 						fileList.add(null);
 						exFilePrinter.println("File " + MidiHandler.NOTE_TABLE[i] + " is not found!");
@@ -88,7 +88,6 @@ public class VideoProcess {
 				e.printStackTrace(exFilePrinter);
 			}
 		}
-		
 	}
 	
 	// get frame from every file to save in frameList
@@ -103,11 +102,15 @@ public class VideoProcess {
 				if(exist(fileList.get(i))) {
 					grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileList.get(i)));
 					
+					int count = 0;
 					while(null !=  (picture = grab.getNativeFrame())) {
 						hold.add(resize(AWTUtil.toBufferedImage(picture)));
+						count ++;
+						System.out.println("-------" + fileList.get(i).getName() + " frame " + count  + " grab success!");
 					}
 					
 					frameList.add(deepCopy(hold));
+					System.out.println("-------" + fileList.get(i).getName() + " grab success!");
 					hold.clear();
 				}else {
 					frameList.add(null);
@@ -245,22 +248,27 @@ public class VideoProcess {
 				if(frame >= myMidi.getNote(index).getSecond() * FPS) {		// if midiEvent happen
 					find = findElm(playList, myMidi.getNote(index).getKey());
 					
-					if(myMidi.getNote(index).getSwitch()) {			// music on.
+					if(myMidi.getNote(index).getSwitch() && exist(frameList.get(myMidi.getNote(index).getKey()))) {	// music on.
 						if(find != NOT_FIND) {
 							playList.get(find).resetFrame();
 						}else {
 							//exFilePrinter.println("----------------" + frameList.get(myMidi.getNote(index).getKey()).size());
-							//playList.add(new Play(myMidi.getNote(index).getKey(), 0, randomPos(playList), frameList.get(index).size()));
+							playList.add(new Play(myMidi.getNote(index).getKey(),
+										0,
+										randomPos(playList),
+										frameList.get(myMidi.getNote(index).getKey()).size()));
 						}
+						System.out.println("playList NOTE " + myMidi.getNote(index).getName() + " turn on at " + frame + " frame!");
 					}else {											// music off
 						if(find != NOT_FIND) {
 							playList.remove(find);
+							System.out.println("playList NOTE " + myMidi.getNote(index).getName() +  " turn off at " + frame + " frame!");
 						}
 					}
 					index++;
 				}
 			
-				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+				/*BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 			
 				for(int play = 0; play < playList.size(); play++) {
 					key = playList.get(play).getKey();
@@ -273,7 +281,7 @@ public class VideoProcess {
 					g.dispose();
 					playList.get(play).nextFrame();
 				}
-				outputList.add(deepCopy(temp));
+				outputList.add(deepCopy(temp));*/
 			}
 		}
 		catch(Exception e) {
