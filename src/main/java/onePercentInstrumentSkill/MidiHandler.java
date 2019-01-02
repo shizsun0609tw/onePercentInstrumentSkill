@@ -24,7 +24,6 @@ public class MidiHandler{
 	    
 		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) {
 			second = (tick*60.0)/(bpm*480);
-			System.out.println("tick: "+ tick);
 			this.tick = tick;
 			this.Channel = Channel;
 			this.on =on;
