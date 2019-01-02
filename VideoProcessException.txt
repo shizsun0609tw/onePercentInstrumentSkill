@@ -83,9 +83,22 @@ File A7 is not found!
 File A#7 is not found!
 File B7 is not found!
 File C8 is not found!
-java.lang.IndexOutOfBoundsException: Index: 110, Size: 109
-	at java.util.ArrayList.rangeCheck(ArrayList.java:653)
-	at java.util.ArrayList.get(ArrayList.java:429)
-	at onePercentInstrumentSkill.VideoProcess.combineFrame(VideoProcess.java:251)
-	at onePercentInstrumentSkill.VideoProcess.start(VideoProcess.java:65)
-	at onePercentInstrumentSkill.VideoProcessTest.main(VideoProcessTest.java:12)
+File C#8 is not found!
+File D8 is not found!
+File D#8 is not found!
+File E8 is not found!
+File F8 is not found!
+File F#8 is not found!
+File G8 is not found!
+File G#8 is not found!
+File A8 is not found!
+File A#8 is not found!
+File B8 is not found!
+File C9 is not found!
+File C#9 is not found!
+File D9 is not found!
+File D#9 is not found!
+File E9 is not found!
+File F9 is not found!
+File F#9 is not found!
+File G9 is not found!
