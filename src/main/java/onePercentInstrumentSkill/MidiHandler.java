@@ -23,7 +23,7 @@ public class MidiHandler{
 	    private int bpm = 60;
 	    
 		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) {
-			second = (tick*60.0)/(bpm*480);
+			second = (tick*60.0)/(bpm*PPQ);
 			this.tick = tick;
 			this.Channel = Channel;
 			this.on =on;
@@ -52,10 +52,12 @@ public class MidiHandler{
 	private Note lastNote;
 	private double lastNoteSecond = 0.0;
 	private int size = 0;
+	private int PPQ;
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final String[] NOTE_TABLE = new String[128];
+    
 	public MidiHandler(String path, int bpm) throws InvalidMidiDataException, IOException {
 		for(int i = 0; i <= 127; i++) {
 			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
@@ -64,6 +66,7 @@ public class MidiHandler{
 		Note tempNote = null;
 		Sequence sequence = MidiSystem.getSequence(new File(path));
         int trackNumber = 0;
+        PPQ = sequence.getResolution();
         for (Track track :  sequence.getTracks()) {
             trackNumber++;
             //System.out.println("Track " + trackNumber + ": size = " + track.size());
