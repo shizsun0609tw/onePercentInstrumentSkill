@@ -28,6 +28,7 @@ public class VideoProcess {
 	private final MidiHandler myMidi;
 	private final String fileName;
 	private final Path myFolderPath;							// input folder
+	private final Random rnd = new Random();
 	private static PrintWriter exFilePrinter;
 	private final static int WIDTH = 960;						// video width
 	private final static int HEIGHT = 720;						// video height
@@ -192,21 +193,20 @@ public class VideoProcess {
 	}
 	
 	private int randomPos(ArrayList<Play> playList) {
-		try {
-			Random rnd = new Random();
+		//try {
 			int temp = rnd.nextInt(ROW * COL);
 			for(int i = 0; i < playList.size(); i++) {
 				if(temp == playList.get(i).getPos()) {
 					temp = rnd.nextInt(ROW * COL);
-					i = 0;
+					i = -1;
 				}
 			}
 			return temp;
-		}
+		/*}
 		catch(Exception e) {
 			e.printStackTrace(exFilePrinter);
 			return 0;
-		}
+		}*/
 	}
 	
 	//deep copy bufferedImage ArrayList
@@ -254,8 +254,8 @@ public class VideoProcess {
 						}else {
 							//exFilePrinter.println("----------------" + frameList.get(myMidi.getNote(index).getKey()).size());
 							playList.add(new Play(myMidi.getNote(index).getKey(),
-										0,
 										randomPos(playList),
+										0,
 										frameList.get(myMidi.getNote(index).getKey()).size()));
 						}
 						System.out.println("playList NOTE " + myMidi.getNote(index).getName() + " turn on at " + frame + " frame!");
@@ -277,7 +277,7 @@ public class VideoProcess {
 					
 					Graphics2D g = temp.createGraphics();
 					g.drawImage(frameList.get(noteKey).get(noteFrame), 
-									notePos % COL * WIDTH, notePos / ROW * HEIGHT, null);
+									(notePos % COL) * (WIDTH / COL), (notePos / ROW) * (HEIGHT / ROW), null);
 					g.dispose();
 					playList.get(play).nextFrame();
 				}
