@@ -63,7 +63,7 @@ public class VideoProcess {
 		getVideo();	
 		getFrame();
 		combineFrame();
-		//generateVideo();
+		generateVideo();
 		System.out.println("Success!");
 		exFilePrinter.flush();
 	}
@@ -194,10 +194,10 @@ public class VideoProcess {
 	private int randomPos(ArrayList<Play> playList) {
 		try {
 			Random rnd = new Random();
-			int temp = rnd.nextInt(9);
+			int temp = rnd.nextInt(ROW * COL);
 			for(int i = 0; i < playList.size(); i++) {
 				if(temp == playList.get(i).getPos()) {
-					temp = rnd.nextInt(9);
+					temp = rnd.nextInt(ROW * COL);
 					i = 0;
 				}
 			}
@@ -242,10 +242,10 @@ public class VideoProcess {
 	// combine frame to outputList
 	private void combineFrame() {
 		ArrayList<Play> playList = new ArrayList<Play>();
-		int find, key, pos;
+		int find, noteKey, notePos, noteFrame;
 		try {
 			for(int frame = 0, index = 0; frame < myMidi.getLastSecond() *  FPS; frame++) { 		// combine every frame by graphic
-				if(frame >= myMidi.getNote(index).getSecond() * FPS) {		// if midiEvent happen
+				if(frame >= myMidi.getNote(index).getSecond() * FPS && index < myMidi.getSize()) {		// if midiEvent happen
 					find = findElm(playList, myMidi.getNote(index).getKey());
 					
 					if(myMidi.getNote(index).getSwitch() && exist(frameList.get(myMidi.getNote(index).getKey()))) {	// music on.
@@ -268,20 +268,27 @@ public class VideoProcess {
 					index++;
 				}
 			
-				/*BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 			
 				for(int play = 0; play < playList.size(); play++) {
-					key = playList.get(play).getKey();
-					pos = playList.get(play).getPos();
-					frame = playList.get(play).getFrame();
+					noteKey = playList.get(play).getKey();
+					notePos = playList.get(play).getPos();
+					noteFrame = playList.get(play).getFrame();
 					
 					Graphics2D g = temp.createGraphics();
-					g.drawImage(frameList.get(key).get(frame), 
-									pos % 3 * WIDTH, pos / 3 * HEIGHT, null);
+					g.drawImage(frameList.get(noteKey).get(noteFrame), 
+									notePos % COL * WIDTH, notePos / ROW * HEIGHT, null);
 					g.dispose();
 					playList.get(play).nextFrame();
 				}
-				outputList.add(deepCopy(temp));*/
+				try {
+					outputList.add(deepCopy(temp));
+					System.out.println("output frame " + frame + " combine success");
+				}
+				catch(Exception e) {
+					System.out.println(e.toString());
+					exFilePrinter.println(e);
+				}
 			}
 		}
 		catch(Exception e) {
