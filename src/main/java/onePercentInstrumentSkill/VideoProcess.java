@@ -2,9 +2,9 @@ package onePercentInstrumentSkill;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.awt.Graphics2D;
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,42 +28,67 @@ public class VideoProcess {
 	private final MidiHandler myMidi;
 	private final String fileName;
 	private final Path myFolderPath;							// input folder
+	private static PrintWriter exFilePrinter;
 	private final static int WIDTH = 960;						// video width
 	private final static int HEIGHT = 720;						// video height
 	private final static int ROW = 3;							// num of rows
 	private final static int COL = 3;							// num of cols
 	private final static int FPS = 60;							// frame per second
+	private final static int NOT_FIND = -1;
 	
 	// constructor
 	public VideoProcess(String folderPath, MidiHandler midiHandler, String outputFileName) {
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
+		outputList = new ArrayList<BufferedImage>();
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
 		fileName = outputFileName;
+		init();
+	}
+	
+	private static void init(){
+		try {
+			File ex = new File("VideoProcessException.txt");
+			exFilePrinter = new PrintWriter(ex);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace(exFilePrinter);
+		}
 	}
 	
 	// start to generate video
 	public void start() {
-		getVideo();
+
+		getVideo();	
 		getFrame();
 		combineFrame();
-		generateVideo();
+		//generateVideo();
 		System.out.println("Success!");
+		exFilePrinter.flush();
 	}
 	
 	// get file from path
 	private void getVideo() {
-		for(int i = 0; i < 1; i++) {
+		for(int i = 0; i < MidiHandler.NOTE_TABLE.length; i++) {
 			try {
-				fileList.add(new File(input));
-			} 
+				if(exist(MidiHandler.NOTE_TABLE[i])) {
+					File temp = new File(myFolderPath + "/" + MidiHandler.NOTE_TABLE[i] + ".mp4");
+					if(temp.exists())fileList.add(temp);
+					else {
+						fileList.add(null);
+						exFilePrinter.println("File " + MidiHandler.NOTE_TABLE[i] + " is not found!");
+					}
+				} else {
+					fileList.add(null);
+				}
+			}
 			catch(Exception e) {
 				fileList.add(null); 
-				System.out.println("GetVideo error");
-				System.out.println(e);
+				e.printStackTrace(exFilePrinter);
 			}
 		}
+		
 	}
 	
 	// get frame from every file to save in frameList
@@ -73,23 +98,27 @@ public class VideoProcess {
 		try {
 			ArrayList<BufferedImage> hold = new ArrayList<BufferedImage>();
 			Picture picture;
+			
 			for(int i = 0; i < fileList.size(); i++) {
 				if(exist(fileList.get(i))) {
 					grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileList.get(i)));
+					
 					while(null !=  (picture = grab.getNativeFrame())) {
 						hold.add(resize(AWTUtil.toBufferedImage(picture)));
 					}
-					frameList.add(new ArrayList<BufferedImage>(hold));
+					
+					frameList.add(deepCopy(hold));
 					hold.clear();
+				}else {
+					frameList.add(null);
 				}
 			}
 		}
 		catch(Exception e) {
 			frameList.add(null);
-			System.out.println("GetFrame error");
-			System.out.println(e);
+			e.printStackTrace(exFilePrinter);
 		}
-	}	
+	}
 	
 	// resize image to correct size
 	private BufferedImage resize(BufferedImage image) {
@@ -103,25 +132,31 @@ public class VideoProcess {
 		}
 		catch (Exception e){
 			System.out.println("Resize error");
-			System.out.println(e);
+			e.printStackTrace(exFilePrinter);
 			return null;
 		}
 	}
 	
-	// inner class Block
-	private class Block {
+	// inner class Play
+	private class Play {
 		private int key;
 		private int pos;
 		private int frame;
+		private final int frameSize;
 		
-		public Block(int key, int pos, int frame) {
+		public Play(int key, int pos, int frame, int frameSize) {
 			this.key = key;
 			this.pos = pos;
 			this.frame = frame;
+			this.frameSize = frameSize;
 		}
 		
 		public void resetFrame() {
 			frame = 0;
+		}
+		
+		public void nextFrame() {
+			if(frame < frameSize - 1) frame++;
 		}
 		
 		public int getKey() {
@@ -138,23 +173,22 @@ public class VideoProcess {
 	}
 	
 	// find element in playList
-	private int findElm(ArrayList<Block> playList, int index) {
+	private int findElm(ArrayList<Play> playList, int index) {
 		try {
 			for(int i = 0; i < playList.size(); i++) {
 				if(playList.get(i).getKey() == index) {
 					return i;
 				}
 			}
-			return -1;
+			return NOT_FIND;
 		}
 		catch (Exception e) {
-			System.out.println("FindElm error");
-			System.out.println(e);
-			return -1;
+			e.printStackTrace(exFilePrinter);
+			return NOT_FIND;
 		}
 	}
 	
-	private int randomPos(ArrayList<Block> playList) {
+	private int randomPos(ArrayList<Play> playList) {
 		try {
 			Random rnd = new Random();
 			int temp = rnd.nextInt(9);
@@ -167,80 +201,83 @@ public class VideoProcess {
 			return temp;
 		}
 		catch(Exception e) {
-			System.out.println("Rnd error");
-			System.out.println(e);
+			e.printStackTrace(exFilePrinter);
 			return 0;
+		}
+	}
+	
+	//deep copy bufferedImage ArrayList
+	private ArrayList<BufferedImage> deepCopy(ArrayList<BufferedImage> source){
+		try {
+			ArrayList<BufferedImage> cp = new ArrayList<BufferedImage>();
+			for(int i = 0; i < source.size(); i++) {
+				cp.add(deepCopy(source.get(i)));
+			}
+			return cp;
+		}
+		catch(Exception e){
+			e.printStackTrace(exFilePrinter);
+			return null;
 		}
 	}
 	
 	// deep copy bufferedImage
 	private BufferedImage deepCopy(BufferedImage source) {
 		try {
-		 BufferedImage b = new BufferedImage(source.getWidth(), source.getHeight(), source.getType());
-		 Graphics2D g = b.createGraphics();
-		 g.drawImage(source, 0, 0, null);
-		 g.dispose();
-		 return b;
+			BufferedImage cp = new BufferedImage(source.getWidth(), source.getHeight(), source.getType());
+			Graphics2D g = cp.createGraphics();
+			g.drawImage(source, 0, 0, null);
+			g.dispose();
+			return cp;
 		}
 		catch(Exception e) {
-			System.out.println("DeepCopy error");
-			System.out.println(e);
+			e.printStackTrace(exFilePrinter);
 			return null;
 		}
 	}
 	
 	// combine frame to outputList
 	private void combineFrame() {
-		ArrayList<Block> playList = new ArrayList<Block>();
+		ArrayList<Play> playList = new ArrayList<Play>();
 		int find, key, pos;
 		try {
 			for(int frame = 0, index = 0; frame < myMidi.getLastSecond() *  FPS; frame++) { 		// combine every frame by graphic
-				try {
-					if(frame >= myMidi.getNote(index).getSecond() * FPS) {		// if midiEvent happen
-						find = findElm(playList, myMidi.getNote(index).getKey());
-						
-						if(myMidi.getNote(index).getSwitch()) {			// music on
-							if(find == -1) {
-								playList.add(new Block(myMidi.getNote(index).getKey(), 0, randomPos(playList)));
-							}else {
-								playList.get(find).resetFrame();
-							}
-						}else {											// music off
-							if(find != -1) {
-								playList.remove(find);
-							}
+				if(frame >= myMidi.getNote(index).getSecond() * FPS) {		// if midiEvent happen
+					find = findElm(playList, myMidi.getNote(index).getKey());
+					
+					if(myMidi.getNote(index).getSwitch()) {			// music on.
+						if(find != NOT_FIND) {
+							playList.get(find).resetFrame();
+						}else {
+							//exFilePrinter.println("----------------" + frameList.get(myMidi.getNote(index).getKey()).size());
+							//playList.add(new Play(myMidi.getNote(index).getKey(), 0, randomPos(playList), frameList.get(index).size()));
 						}
-						index++;
+					}else {											// music off
+						if(find != NOT_FIND) {
+							playList.remove(find);
+						}
 					}
+					index++;
 				}
-				catch (Exception e){
-					System.out.println("Event error");
-					System.out.println(e);
-				}
-				
+			
 				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-				try {
-					for(int play = 0; play < playList.size(); play++) {
-						key = playList.get(play).getKey();
-						pos = playList.get(play).getPos();
-						frame = playList.get(play).getFrame();
-						
-						Graphics2D g = temp.createGraphics();
-						g.drawImage(frameList.get(key).get(frame), 
-										pos % 3 * WIDTH, pos / 3 * HEIGHT, null);
-						g.dispose();
-					}
-					outputList.add(deepCopy(temp));
+			
+				for(int play = 0; play < playList.size(); play++) {
+					key = playList.get(play).getKey();
+					pos = playList.get(play).getPos();
+					frame = playList.get(play).getFrame();
+					
+					Graphics2D g = temp.createGraphics();
+					g.drawImage(frameList.get(key).get(frame), 
+									pos % 3 * WIDTH, pos / 3 * HEIGHT, null);
+					g.dispose();
+					playList.get(play).nextFrame();
 				}
-				catch (Exception e){
-					System.out.println("Graphic error");
-					System.out.println(e);
-				}
+				outputList.add(deepCopy(temp));
 			}
 		}
 		catch(Exception e) {
-			System.out.println("Combine Error");
-			System.out.println(e);
+			e.printStackTrace(exFilePrinter);
 		}
 	}
 	
@@ -248,7 +285,7 @@ public class VideoProcess {
 	private void generateVideo() {
 		FileChannelWrapper out = null;
 		try {
-			out = NIOUtils.writableFileChannel(fileName);
+			out = NIOUtils.writableFileChannel(fileName + ".mp4");
 			
 			AWTSequenceEncoder encoder = new AWTSequenceEncoder(out, Rational.R(FPS, 1));
 			for (int i = 0; i < outputList.size(); i++) {
@@ -258,10 +295,10 @@ public class VideoProcess {
 			encoder.finish();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.printStackTrace(exFilePrinter);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.printStackTrace(exFilePrinter);
 		} finally {
 			NIOUtils.closeQuietly(out);
 		}
