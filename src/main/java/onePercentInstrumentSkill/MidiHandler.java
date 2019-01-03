@@ -123,7 +123,7 @@ public class MidiHandler{
 		return size;
 	}
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
-		MidiHandler mh = new MidiHandler("src/test/resources/video_test_midi.midi", 120);
+		MidiHandler mh = new MidiHandler("src/test/resources/test.midi", 120);
 		int maxkey = 0;
 		try {
 			for(int i = 0; i < mh.getSize(); i++) {
