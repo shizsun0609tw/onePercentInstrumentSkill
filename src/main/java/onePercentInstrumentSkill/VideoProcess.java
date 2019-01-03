@@ -21,6 +21,7 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.common.model.Rational;
 import org.jcodec.scale.AWTUtil;
 
+import com.twelvemonkeys.image.;
 
 public class VideoProcess {
 	private ArrayList<File> fileList;							// input fileList path
@@ -193,24 +194,19 @@ public class VideoProcess {
 		}
 	}
 	
+	// generate random block position
 	private int randomPos(ArrayList<Play> playList) {
-		//try {
-			int temp = rnd.nextInt(ROW * COL);
-			for(int i = 0; i < playList.size(); i++) {
-				if(temp == playList.get(i).getPos()) {
-					temp = rnd.nextInt(ROW * COL);
-					i = -1;
-				}
+		int temp = rnd.nextInt(ROW * COL);
+		for(int i = 0; i < playList.size(); i++) {
+			if(temp == playList.get(i).getPos()) {
+				temp = rnd.nextInt(ROW * COL);
+				i = -1;
 			}
-			return temp;
-		/*}
-		catch(Exception e) {
-			e.printStackTrace(exFilePrinter);
-			return 0;
-		}*/
+		}
+		return temp;
 	}
 	
-	//deep copy bufferedImage ArrayList
+	// deep copy bufferedImage ArrayList
 	private ArrayList<BufferedImage> deepCopy(ArrayList<BufferedImage> source){
 		try {
 			ArrayList<BufferedImage> cp = new ArrayList<BufferedImage>();
