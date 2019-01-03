@@ -199,7 +199,12 @@ public class VideoProcess {
 	// generate random block position
 	private int randomPos(ArrayList<Play> playList) {
 		int temp = rnd.nextInt(ROW * COL);
+		int count = 0;
 		for(int i = 0; i < playList.size(); i++) {
+			count++;
+			if(count > 100) {
+				return temp;
+			}
 			if(temp == playList.get(i).getPos()) {
 				temp = rnd.nextInt(ROW * COL);
 				i = -1;
