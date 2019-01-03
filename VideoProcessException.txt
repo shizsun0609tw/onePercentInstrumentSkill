@@ -37,16 +37,7 @@ File G#3 is not found!
 File A3 is not found!
 File A#3 is not found!
 File B3 is not found!
-File C#4 is not found!
-File D4 is not found!
-File E4 is not found!
-File F4 is not found!
 File F#4 is not found!
-File G4 is not found!
-File G#4 is not found!
-File A4 is not found!
-File B4 is not found!
-File C5 is not found!
 File C#5 is not found!
 File D5 is not found!
 File D#5 is not found!

@@ -21,6 +21,7 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.common.model.Rational;
 import org.jcodec.scale.AWTUtil;
 
+
 public class VideoProcess {
 	private ArrayList<File> fileList;							// input fileList path
 	private ArrayList<ArrayList<BufferedImage>> frameList;		// grab bufferImage from fileList
@@ -244,22 +245,24 @@ public class VideoProcess {
 		ArrayList<Play> playList = new ArrayList<Play>();
 		int find, noteKey, notePos, noteFrame;
 		try {
-			for(int frame = 0, index = 0; frame < myMidi.getLastSecond() *  FPS; frame++) { 		// combine every frame by graphic
-				if(frame >= myMidi.getNote(index).getSecond() * FPS && index < myMidi.getSize()) {		// if midiEvent happen
+			// combine every frame by graphic
+			for(int frame = 0, index = 0; frame < myMidi.getLastSecond() *  FPS; frame++) { 		
+				// if midiEvent happen
+				while(frame >= myMidi.getNote(index).getSecond() * FPS && index < myMidi.getSize()) {
 					find = findElm(playList, myMidi.getNote(index).getKey());
-					
-					if(myMidi.getNote(index).getSwitch() && exist(frameList.get(myMidi.getNote(index).getKey()))) {	// music on.
+					// music on.
+					if(myMidi.getNote(index).getSwitch() && exist(frameList.get(myMidi.getNote(index).getKey()))) {	
 						if(find != NOT_FIND) {
 							playList.get(find).resetFrame();
 						}else {
-							//exFilePrinter.println("----------------" + frameList.get(myMidi.getNote(index).getKey()).size());
 							playList.add(new Play(myMidi.getNote(index).getKey(),
 										randomPos(playList),
 										0,
 										frameList.get(myMidi.getNote(index).getKey()).size()));
 						}
 						System.out.println("playList NOTE " + myMidi.getNote(index).getName() + " turn on at " + frame + " frame!");
-					}else {											// music off
+					// music off
+					}else {															
 						if(find != NOT_FIND) {
 							playList.remove(find);
 							System.out.println("playList NOTE " + myMidi.getNote(index).getName() +  " turn off at " + frame + " frame!");
@@ -268,8 +271,10 @@ public class VideoProcess {
 					index++;
 				}
 			
-				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-			
+				// combine image by graphic to generate output image list
+					//BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+				BufferedImage temp = new MappedImageFactory.createCompatibleMappedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+				
 				for(int play = 0; play < playList.size(); play++) {
 					noteKey = playList.get(play).getKey();
 					notePos = playList.get(play).getPos();
