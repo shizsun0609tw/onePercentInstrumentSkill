@@ -1,19 +1,18 @@
 package onePercentInstrumentSkill;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import java.io.File;
-import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.jcodec.api.FrameGrab;
-import org.jcodec.api.JCodecException;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.FileChannelWrapper;
 import org.jcodec.common.io.NIOUtils;
@@ -21,17 +20,17 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.common.model.Rational;
 import org.jcodec.scale.AWTUtil;
 
-import com.twelvemonkeys.image.;
-
 public class VideoProcess {
 	private ArrayList<File> fileList;							// input fileList path
 	private ArrayList<ArrayList<BufferedImage>> frameList;		// grab bufferImage from fileList
 	private ArrayList<BufferedImage> outputList;				// save bufferImage after combine frame
+	private PrintWriter exFilePrinter;
+	private FileChannelWrapper out;
+	private AWTSequenceEncoder encoder;	
 	private final MidiHandler myMidi;
 	private final String fileName;
 	private final Path myFolderPath;							// input folder
 	private final Random rnd = new Random();
-	private static PrintWriter exFilePrinter;
 	private final static int WIDTH = 960;						// video width
 	private final static int HEIGHT = 720;						// video height
 	private final static int ROW = 3;							// num of rows
@@ -40,35 +39,38 @@ public class VideoProcess {
 	private final static int NOT_FIND = -1;
 	
 	// constructor
-	public VideoProcess(String folderPath, MidiHandler midiHandler, String outputFileName) {
+	public VideoProcess(String folderPath, MidiHandler midiHandler, String outputFileName) throws FileNotFoundException{
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
 		outputList = new ArrayList<BufferedImage>();
+		exFilePrinter = new PrintWriter(new File("VideoProcessException.txt"));
+		
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
 		fileName = outputFileName;
-		init();
 	}
-	
-	private static void init(){
-		try {
-			File ex = new File("VideoProcessException.txt");
-			exFilePrinter = new PrintWriter(ex);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace(exFilePrinter);
-		}
-	}
-	
+		
 	// start to generate video
-	public void start() {
-
+	public void start() throws IOException {
+		initEncode();
+		
 		getVideo();	
 		getFrame();
 		combineFrame();
-		generateVideo();
+		
 		System.out.println("Success!");
 		exFilePrinter.flush();
+		finishEncode();
+	}
+	
+	// init encode
+	private void initEncode() throws IOException {
+		out = NIOUtils.writableFileChannel(fileName + ".mp4");
+		encoder = new AWTSequenceEncoder(out, Rational.R(FPS, 1));
+	}
+	
+	private void finishEncode() throws IOException {
+		encoder.finish();
 	}
 	
 	// get file from path
@@ -268,9 +270,8 @@ public class VideoProcess {
 				}
 			
 				// combine image by graphic to generate output image list
-					//BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-				BufferedImage temp = new MappedImageFactory.createCompatibleMappedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
-				
+				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+			
 				for(int play = 0; play < playList.size(); play++) {
 					noteKey = playList.get(play).getKey();
 					notePos = playList.get(play).getPos();
@@ -283,7 +284,8 @@ public class VideoProcess {
 					playList.get(play).nextFrame();
 				}
 				try {
-					outputList.add(deepCopy(temp));
+					writeVideo(deepCopy(temp));
+					//outputList.add(deepCopy(temp));
 					System.out.println("output frame " + frame + " combine success");
 				}
 				catch(Exception e) {
@@ -297,18 +299,12 @@ public class VideoProcess {
 		}
 	}
 	
-	// generate output video
-	private void generateVideo() {
+	// write to video
+	private void writeVideo(BufferedImage temp) {
 		FileChannelWrapper out = null;
 		try {
-			out = NIOUtils.writableFileChannel(fileName + ".mp4");
-			
-			AWTSequenceEncoder encoder = new AWTSequenceEncoder(out, Rational.R(FPS, 1));
-			for (int i = 0; i < outputList.size(); i++) {
-				encoder.encodeImage(outputList.get(i));
-			}
+			encoder.encodeImage(temp);
 			// Finalize the encoding, i.e. clear the buffers, write the header, etc.
-			encoder.finish();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace(exFilePrinter);
