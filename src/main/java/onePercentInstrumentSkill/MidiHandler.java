@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiSystem;
@@ -53,12 +54,14 @@ public class MidiHandler{
 	private double lastNoteSecond = 0.0;
 	private int size = 0;
 	private int PPQ;
+	private int bpm;
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
+    public static final int SET_TEMPO = 0x51;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final String[] NOTE_TABLE = new String[128];
     
-	public MidiHandler(String path, int bpm) throws InvalidMidiDataException, IOException {
+	public MidiHandler(String path) throws InvalidMidiDataException, IOException {
 		for(int i = 0; i <= 127; i++) {
 			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
 			else NOTE_TABLE[i] = null;
@@ -67,6 +70,24 @@ public class MidiHandler{
 		Sequence sequence = MidiSystem.getSequence(new File(path));
         int trackNumber = 0;
         PPQ = sequence.getResolution();
+        // find bpm info
+        Track[] tracks = sequence.getTracks();
+        for (int i = 0; i < tracks[0].size(); i++) {
+            MidiEvent event = tracks[0].get(i);
+            MidiMessage message = event.getMessage();
+            if (message instanceof MetaMessage) {
+                MetaMessage mm = (MetaMessage) message;
+                if(mm.getType()==SET_TEMPO){
+                    // now what?
+                    byte[] bpmData = mm.getData();
+                    int tempo = (bpmData[0] & 0xff) << 16 | (bpmData[1] & 0xff) << 8 | (bpmData[2] & 0xff);
+                    bpm = 60000000 / tempo;
+                    break;
+                    
+                }
+            }
+        }
+        
         for (Track track :  sequence.getTracks()) {
             trackNumber++;
             //System.out.println("Track " + trackNumber + ": size = " + track.size());

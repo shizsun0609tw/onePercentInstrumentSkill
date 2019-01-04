@@ -7,7 +7,7 @@ import javax.sound.midi.InvalidMidiDataException;
 public class VideoProcessTest {
 	public static void main(String[] args) {
 		try {
-			MidiHandler handlerTest = new MidiHandler("src/test/resources/test.midi", 120);
+			MidiHandler handlerTest = new MidiHandler("src/test/resources/test.midi");
 			VideoProcess processTest = new VideoProcess("src/test/resources/", handlerTest);
 			processTest.start();
 		} catch (InvalidMidiDataException e) {
