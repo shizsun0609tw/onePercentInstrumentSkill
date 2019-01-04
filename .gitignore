@@ -1,1 +1,5 @@
 /target/
+.class
+mp4Output.mp4
+wavOutput.wav
+.txt
