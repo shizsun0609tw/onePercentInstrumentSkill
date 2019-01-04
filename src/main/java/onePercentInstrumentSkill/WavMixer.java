@@ -15,68 +15,32 @@ public class WavMixer{
     private Boolean[] isKeyPlaying = new Boolean[128];
     private MidiHandler midi;
     private final static int NOT_FIND = -1;
-    // store note status in whole midi file
-    // use to check if the note should currently play or not
-    // inner Class of WavMixer
-    public class NoteStatus{
-    	private int status = 0; // status > 0 => isPlaying
-    	private long totalNoteFrame;	// how much frame in this note
-    	private long currentNoteFrame;
-    	private String noteName;
-    	public NoteStatus(String noteName, long totalNoteFrame) {
-    		this.status = 0;
-    		this.totalNoteFrame = totalNoteFrame;
-    		this.currentNoteFrame = 0;
-    		this.noteName = noteName;
-    	}
-    	public int getStatus() {
-    		return status;
-    	}
-    	public int onOnce(){
-    		status += 1;
-    		setCurrentFrameToZero();
-    		return status;
-    	}
-    	public int offOnce() {
-    		if(status > 0) status -= 1;
-    		return status;
-    	}
-    	public long getTotalFrame() {
-    		return totalNoteFrame;
-    	}
-    	public long getCurrentFrame() {
-    		return currentNoteFrame;
-    	}
-    	public long setCurrentFrameToZero() {
-    		currentNoteFrame = 0;
-    		return currentNoteFrame;
-    	}
-    	public void setCurrentFrame(long set) {
-    		currentNoteFrame = set;
-    	}
-    	public String getName() {
-    		return noteName;
-    	}
-    	
-    }
+
     // inner Class store currently playing note.
 	private class Play {
 		private int key;
 		private long frame;
 		private final long frameSize;
-		
-		public Play(int key, long frame, long frameSize) {
+		private int velocity;
+		public Play(int key, long frame, long frameSize, int velocity) {
 			this.key = key;
 			this.frame = frame;
 			this.frameSize = frameSize;
+			this.velocity = velocity;
 		}
 		
 		public void resetFrame() {
 			frame = 0;
 		}
 		
-		public void nextFrame() {
-			if(frame < frameSize - 1) frame++;
+		public Boolean nextFrame() {
+			if(frame < frameSize - 1) {
+				frame++;
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 		
 		public int getKey() {
@@ -85,6 +49,10 @@ public class WavMixer{
 		
 		public long getFrame() {
 			return frame;
+		}
+		
+		public int getVelocity() {
+			return this.velocity;
 		}
 	}
 	// find element in playList
@@ -162,26 +130,33 @@ public class WavMixer{
     }
     
     public void walkThroughAllFrame(){
+    	double maxVolumn = 0.0;
+    	double minVolumn = 0.0;
     	if(outputWavFile != null) {
 	    	ArrayList<Play> playList = new ArrayList<Play>();	    	
-	    	int find, noteKey, noteFrame;
-	    	
+	    	int find, noteKey, noteFrame, noteVelocity;
+
 	    	for(int frame = 0, index = 0;frame < numFrames; frame++) {
 	    		// if the midi event occur at this frame
-	    		if(frame >= midi.getNote(index).getSecond()*sampleRate && index < midi.getSize()) {
+	    		while(frame >= midi.getNote(index).getSecond()*sampleRate && index < midi.getSize()) {
 	    			find = findElm(playList, midi.getNote(index).getKey());
 	    			// if key == on && key exist
 	    			if(midi.getNote(index).getSwitch() && wavData[midi.getNote(index).getKey()] != null) {
 	    				// if the note is already playing, restart playing it.
 	    				if(find != NOT_FIND) {
-	    					playList.get(find).resetFrame();
+	    					//playList.get(find).resetFrame();
+	    					playList.add(new Play(midi.getNote(index).getKey(),
+	    							0,
+	    							wavData[midi.getNote(index).getKey()].getNumFrames(),
+	    							midi.getNote(index).getVelocity()));
 	    				}
 	    				// if the note is off
 	    				else {
 	    					// add this note to current frame 
 	    					playList.add(new Play(midi.getNote(index).getKey(),
 	    							0,
-	    							wavData[midi.getNote(index).getKey()].getNumFrames()));
+	    							wavData[midi.getNote(index).getKey()].getNumFrames(),
+	    							midi.getNote(index).getVelocity()));
 	    				}
 	    				System.out.println("playList NOTE " + midi.getNote(index).getName() + " turn on at " + frame + " frame!");
 	    			}
@@ -206,9 +181,30 @@ public class WavMixer{
 	    			// add note to buffer and write to audio file
 	    			noteKey = playList.get(play).getKey();
 	    			noteFrame = (int)playList.get(play).getFrame();
-	    			frameBuffer[0][0] += (wavDataBuffer[noteKey][0][noteFrame]/2);
-	    			frameBuffer[1][0] += (wavDataBuffer[noteKey][1][noteFrame]/2);
-	    			playList.get(play).nextFrame();
+	    			noteVelocity = playList.get(play).getVelocity();
+	    			frameBuffer[0][0] += ((wavDataBuffer[noteKey][0][noteFrame]/128.0)*noteVelocity);
+	    			frameBuffer[1][0] += ((wavDataBuffer[noteKey][1][noteFrame]/128.0)*noteVelocity);
+	    			if(!playList.get(play).nextFrame()){
+	    				playList.remove(play);
+	    			}
+	    		}
+	    		if(frameBuffer[0][0] >= 0.99) {
+	    			frameBuffer[0][0] = 0.99;
+	    		}
+	    		if(frameBuffer[1][0] >= 0.99) {
+	    			frameBuffer[1][0] = 0.99;
+	    		}
+	    		if(frameBuffer[0][0] <= -0.99) {
+	    			frameBuffer[0][0] = -0.99;
+	    		}
+	    		if(frameBuffer[1][0] <= -0.99) {
+	    			frameBuffer[1][0] = -0.99;
+	    		}
+	    		if(Math.max(frameBuffer[0][0], frameBuffer[1][0]) > maxVolumn) {
+	    			maxVolumn = Math.max(frameBuffer[0][0], frameBuffer[1][0]);
+	    		}
+	    		if(Math.min(frameBuffer[0][0], frameBuffer[1][0]) < minVolumn) {
+	    			minVolumn = Math.max(frameBuffer[0][0], frameBuffer[1][0]);
 	    		}
 	    		// write buffer to output
 	    		try {
@@ -226,6 +222,8 @@ public class WavMixer{
     	else {
     		System.out.println("WavMixer Error: Output File haven't been open!");
     	}
+    	System.out.println("Max Volumn: "+maxVolumn);
+    	System.out.println("Min Volumn: "+minVolumn);
         return;
     }
 

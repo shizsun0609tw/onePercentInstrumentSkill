@@ -48,6 +48,9 @@ public class MidiHandler{
 		public String getName() {
 			return this.name;
 		}
+		public int getVelocity() {
+			return this.velocity;
+		}
 	}
 	private ArrayList<Note> notes = new ArrayList<Note>();
 	private Note lastNote;
