@@ -257,7 +257,6 @@ public class VideoProcess {
 	
 	// combine frame to outputList
 	private void combineFrame() {
-		BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		ArrayList<Play> playList = new ArrayList<Play>();
 		int find, noteKey, notePos, noteFrame;
 		try {
@@ -288,7 +287,8 @@ public class VideoProcess {
 				}
 			
 				// combine image by graphic to generate output image list
-			
+				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+				
 				for(int play = 0; play < playList.size(); play++) {
 					noteKey = playList.get(play).getKey();
 					notePos = playList.get(play).getPos();
@@ -301,7 +301,7 @@ public class VideoProcess {
 					playList.get(play).nextFrame();
 				}
 				try {
-					writeVideo(temp);
+					writeVideo(deepCopy(temp));
 					System.out.println("output frame " + frame + " combine success");
 				}
 				catch(Exception e) {
