@@ -46,6 +46,10 @@ public class MergeFiles {
 			ffmpeg = new FFmpeg("./ffmpeg_local");
 			ffprobe = new FFprobe("./ffprobe_local");
 			System.out.println("Find ffmpeg/ffprobe success.");
+		}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
+			ffmpeg = new FFmpeg("./ffmpeg.exe");
+			ffprobe = new FFprobe("./ffprobe.exe");
+			System.out.println("Find ffmpeg/ffprobe success.");
 		}
 
 		
