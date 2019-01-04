@@ -23,14 +23,13 @@ import org.jcodec.scale.AWTUtil;
 public class VideoProcess {
 	private ArrayList<File> fileList;							// input fileList path
 	private ArrayList<ArrayList<BufferedImage>> frameList;		// grab bufferImage from fileList
-	private ArrayList<BufferedImage> outputList;				// save bufferImage after combine frame
 	private PrintWriter exFilePrinter;
 	private FileChannelWrapper out;
 	private AWTSequenceEncoder encoder;	
 	private final MidiHandler myMidi;
-	private final String fileName;
 	private final Path myFolderPath;							// input folder
 	private final Random rnd = new Random();
+	private final static String fileName = "mp4Output";
 	private final static int WIDTH = 960;						// video width
 	private final static int HEIGHT = 720;						// video height
 	private final static int ROW = 3;							// num of rows
@@ -39,15 +38,14 @@ public class VideoProcess {
 	private final static int NOT_FIND = -1;
 	
 	// constructor
-	public VideoProcess(String folderPath, MidiHandler midiHandler, String outputFileName) throws FileNotFoundException{
+	public VideoProcess(String folderPath, MidiHandler midiHandler) throws FileNotFoundException{
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
-		outputList = new ArrayList<BufferedImage>();
 		exFilePrinter = new PrintWriter(new File("VideoProcessException.txt"));
 		
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
-		fileName = outputFileName;
+		out = null;
 	}
 		
 	// start to generate video
@@ -306,7 +304,6 @@ public class VideoProcess {
 	
 	// write to video
 	private void writeVideo(BufferedImage temp) {
-		FileChannelWrapper out = null;
 		try {
 			encoder.encodeImage(temp);
 			// Finalize the encoding, i.e. clear the buffers, write the header, etc.
