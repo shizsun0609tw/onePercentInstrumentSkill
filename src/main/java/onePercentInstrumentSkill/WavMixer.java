@@ -102,17 +102,8 @@ public class WavMixer{
 			return NOT_FIND;
 		}
 	}
-    public WavMixer() {
-    	try {
-			MidiHandler mh = new MidiHandler("src/main/resources/test.midi", 120);
-		} catch (InvalidMidiDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
+	
+	// Constructor
     public WavMixer(MidiHandler midi, String outputFilePath, int sampleRate){
     	this.sampleRate = sampleRate;
     	this.duration = midi.getLastSecond();
@@ -170,7 +161,7 @@ public class WavMixer{
     	}
     }
     
-    public void walkThroughAllFrame(String outputPath){
+    public void walkThroughAllFrame(){
     	if(outputWavFile != null) {
 	    	ArrayList<Play> playList = new ArrayList<Play>();	    	
 	    	int find, noteKey, noteFrame;
