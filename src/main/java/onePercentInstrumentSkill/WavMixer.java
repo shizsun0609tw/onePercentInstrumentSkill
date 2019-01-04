@@ -133,7 +133,7 @@ public class WavMixer{
         return this.outputWavFile;
     }
 
-    private void loadWavFile() {
+    public void loadWavFile() {
     	String dirPath = "src/test/resources/";
     	for(int i = 0; i < 128; i++) {
 			if(MidiHandler.NOTE_TABLE[i] != null) {
@@ -215,8 +215,8 @@ public class WavMixer{
 	    			// add note to buffer and write to audio file
 	    			noteKey = playList.get(play).getKey();
 	    			noteFrame = (int)playList.get(play).getFrame();
-	    			frameBuffer[0][0] += (wavDataBuffer[noteKey][0][noteFrame]);//playList.size());
-	    			frameBuffer[1][0] += (wavDataBuffer[noteKey][1][noteFrame]);//playList.size());
+	    			frameBuffer[0][0] += (wavDataBuffer[noteKey][0][noteFrame]/2);
+	    			frameBuffer[1][0] += (wavDataBuffer[noteKey][1][noteFrame]/2);
 	    			playList.get(play).nextFrame();
 	    		}
 	    		// write buffer to output
@@ -237,22 +237,5 @@ public class WavMixer{
     	}
         return;
     }
-    public static void main(String[] args) {
-    	MidiHandler midi;
-		try {
-			midi = new MidiHandler("src/test/resources/Only_my_railgun.midi", 120);
-	    	String outputFilePath = "src/test/OnlyMyRailGunOutputTest.wav";
-	    	
-	    	WavMixer temp = new WavMixer(midi, outputFilePath, 48000);
-	    	temp.loadWavFile();
-	    	temp.walkThroughAllFrame("audioOutputTest.wav");
-		} catch (InvalidMidiDataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-    }
 }
