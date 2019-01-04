@@ -4,7 +4,10 @@ package onePercentInstrumentSkill;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.bramp.
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 
 public class MergeFiles {
@@ -21,44 +24,44 @@ public class MergeFiles {
 	}
 	
 	// start to merge
-	public void start() {
+	public void start() throws IOException {
 		mergeFiles();
 	}
 	
 	// merge wav and mp4
-	 public boolean doSomething() {
+	private void mergeFiles() throws IOException {
+		FFmpeg ffmpeg = new FFmpeg();
+		FFprobe ffprobe = new FFprobe();
+		
+		FFmpegBuilder builder = new FFmpegBuilder()
+				
+			      .addInput(folderPath + "wavOutput.wav")
+				  .addInput(folderPath + "mp4Output.mp4")     // Filename, or a FFmpegProbeResult
+				  .overrideOutputFiles(true) // Override the output if it exists
 
-		 String[] exeCmd = new String[]{"ffmpeg", "-i", "audioInput.mp3", "-i", "videoInput.avi" ,"-acodec", "copy", "-vcodec", "copy", "outputFile.avi"};
+				  .addOutput(outputName)   // Filename for the destination
+				    .setFormat("mp4")        // Format is inferred from filename, or can be set
+				  
+				    .disableSubtitle()       // No subtiles
 
-		 ProcessBuilder pb = new ProcessBuilder(exeCmd);
-		 boolean exeCmdStatus = executeCMD(pb);
+				    .setAudioChannels(2)         // Mono audio
+				    .setAudioCodec("wav")        // using the aac codec
+				    .setAudioSampleRate(48000)  // at 48KHz
+				    .setAudioBitRate(1536)      // at 32 kbit/s
 
-		 return exeCmdStatus;
-		} //End doSomething Function
+				    .setVideoCodec("libx264")     // Video using x2-64
+				    .setVideoFrameRate(60, 1)     // at 60 frames per second
+				    .setVideoResolution(960, 720) // at 640x480 resolution
 
-		private boolean executeCMD(ProcessBuilder pb)
-		{
-		 pb.redirectErrorStream(true);
-		 Process p = null;
+				    .setStrict(FFmpegBuilder.Strict.EXPERIMENTAL) // Allow FFmpeg to use experimental specs
+				    .done();
 
-		 try {
-		  p = pb.start();
+				FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 
-		 } catch (Exception ex) {
-		 ex.printStackTrace();
-		 System.out.println("oops");
-		 p.destroy();
-		 return false;
-		}
-		// wait until the process is done
-		try {
-		 p.waitFor();
-		} catch (InterruptedException e) {
-		e.printStackTrace();
-		System.out.println("woopsy");
-		p.destroy();
-		return false;
-		}
-		return true;
-		 }// End function executeCMD
+				// Run a one-pass encode
+				executor.createJob(builder).run();
+
+				// Or run a two-pass encode (which is better quality at the cost of being slower)
+				executor.createTwoPassJob(builder).run();
+	}
 }
