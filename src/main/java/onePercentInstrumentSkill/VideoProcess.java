@@ -56,9 +56,10 @@ public class VideoProcess {
 		getFrame();
 		combineFrame();
 		
+		finishEncode();
+		
 		System.out.println("Success!");
 		exFilePrinter.flush();
-		finishEncode();
 	}
 	
 	// init encode
@@ -67,8 +68,19 @@ public class VideoProcess {
 		encoder = new AWTSequenceEncoder(out, Rational.R(FPS, 1));
 	}
 	
-	private void finishEncode() throws IOException {
-		encoder.finish();
+	private void finishEncode() {
+		try {
+			// Finalize the encoding, i.e. clear the buffers, write the header, etc.
+			encoder.finish();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			NIOUtils.closeQuietly(out);
+		}
 	}
 	
 	// get file from path
@@ -314,8 +326,6 @@ public class VideoProcess {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace(exFilePrinter);
-		} finally {
-			NIOUtils.closeQuietly(out);
 		}
 	}
 	
