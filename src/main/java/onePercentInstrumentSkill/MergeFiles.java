@@ -24,6 +24,7 @@ public class MergeFiles {
 	private final String outputName;
 	private final String inputMp4;
 	private final String inputWav;
+	private final String inputDir = "./tmp/";
 	
 	public MergeFiles(String folderPath, String outputName){
 		this.inputMp4 = folderPath + "mp4Output.mp4";
@@ -57,8 +58,8 @@ public class MergeFiles {
 		System.out.println(path.normalize().toAbsolutePath());	
 		
 		FFmpegBuilder builder = new FFmpegBuilder()
-				  .addInput("mp4Output.mp4")     // Filename, or a FFmpegProbeResult
-			      .addInput("wavOutput.wav")
+				  .addInput(inputDir+"mp4Output.mp4")     // Filename, or a FFmpegProbeResult
+			      .addInput(inputDir+"wavOutput.wav")
 				  
 				  .overrideOutputFiles(true) // Override the output if it exists
 
