@@ -12,10 +12,11 @@ public class WavMixer{
     private long numFrames;
     private String inputDir;		// "./" is at "{project path}/onePercentInstrumentSkill/"
     private MidiHandler midi;
+    private PrintWriter exPrinter;
     private WavFile[] wavData = new WavFile[128];
     private double[][][] wavDataBuffer = new double[128][2][];
     private final static int NOT_FIND = -1;
-
+    
     // inner Class store currently playing note.
 	private class Play {
 		private int key;
@@ -66,28 +67,32 @@ public class WavMixer{
 			return NOT_FIND;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(exPrinter);
+			exPrinter.flush();
 			return NOT_FIND;
 		}
 	}
 	
 	// Constructor
-    public WavMixer(MidiHandler midi, String outputFileName, int sampleRate){
+    public WavMixer(MidiHandler midi, String outputFileName, int sampleRate) throws FileNotFoundException{
     	this.inputDir = "./tmp/";
     	this.sampleRate = sampleRate;
     	this.duration = midi.getLastSecond();
         this.numFrames = (long)(duration * sampleRate);
         this.midi = midi;
+        this.exPrinter = new PrintWriter(new File("./tmp/WavMixer.txt"));
         
         String outputDir = "./tmp/";
     	try {
 			outputWavFile = WavFile.newWavFile(new File(outputDir+outputFileName), 2, numFrames, 16, sampleRate);
 		} catch (IOException e1) {
-			System.err.println("IOException when opening outputWavFile.");
-			e1.printStackTrace();
+			exPrinter.println("IOException when opening outputWavFile.");
+			e1.printStackTrace(exPrinter);
+			exPrinter.flush();
 		} catch (WavFileException e1) {
-			System.err.println("WavFileException when opening outputWavFile.");
-			e1.printStackTrace();
+			exPrinter.println("WavFileException when opening outputWavFile.");
+			e1.printStackTrace(exPrinter);
+			exPrinter.flush();
 		}
 
     }    
@@ -104,13 +109,17 @@ public class WavMixer{
 	    			File tempFile = new File(dirPath+MidiHandler.NOTE_TABLE[i]+".wav");
 					wavData[i] = WavFile.openWavFile(tempFile);
 				} catch(FileNotFoundException fnfe) {
+					fnfe.printStackTrace(exPrinter);
+					exPrinter.flush();
 					continue;
 				}catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e.printStackTrace(exPrinter);
+					exPrinter.flush();
 				} catch (WavFileException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					e.printStackTrace(exPrinter);
+					exPrinter.flush();
 				} 
 				// read wav file to each Buffer
 				if(null != wavData[i]) {
@@ -122,10 +131,12 @@ public class WavMixer{
 						System.out.println(i);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						e.printStackTrace(exPrinter);
+						exPrinter.flush();
 					} catch (WavFileException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						e.printStackTrace(exPrinter);
+						exPrinter.flush();
 					}
 				}
 			}
@@ -213,11 +224,13 @@ public class WavMixer{
 	    		try {
 					outputWavFile.writeFrames(frameBuffer, 1);
 				} catch (IOException e) {
-					System.err.println("outputWavFile IOException @frame: "+frame+", @index: "+index);
-					e.printStackTrace();
+					exPrinter.println("outputWavFile IOException @frame: "+frame+", @index: "+index);
+					e.printStackTrace(exPrinter);
+					exPrinter.flush();
 				} catch (WavFileException e) {
-					System.err.println("outputWavFile WavFileException @frame: "+frame+", @index: "+index);
-					e.printStackTrace();
+					exPrinter.println("outputWavFile WavFileException @frame: "+frame+", @index: "+index);
+					e.printStackTrace(exPrinter);
+					exPrinter.flush();
 				}
 	
 	    	}

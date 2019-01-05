@@ -24,7 +24,7 @@ import org.jcodec.scale.AWTUtil;
 public class VideoProcess {
 	private ArrayList<File> fileList;							// input fileList path
 	private ArrayList<ArrayList<BufferedImage>> frameList;		// grab bufferImage from fileList
-	private PrintWriter exFilePrinter;
+	private PrintWriter exPrinter;
 	private FileChannelWrapper out;
 	private AWTSequenceEncoder encoder;	
 	private final MidiHandler myMidi;
@@ -43,7 +43,7 @@ public class VideoProcess {
 	public VideoProcess(String folderPath, MidiHandler midiHandler) throws FileNotFoundException{
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
-		exFilePrinter = new PrintWriter(new File("VideoProcessException.txt"));
+		exPrinter = new PrintWriter(new File(outputPath + "VideoProcessException.txt"));
 		
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
@@ -61,7 +61,7 @@ public class VideoProcess {
 		finishEncode();
 		
 		System.out.println("Success!");
-		exFilePrinter.flush();
+		exPrinter.flush();
 	}
 	
 	// init encode
@@ -76,10 +76,10 @@ public class VideoProcess {
 			encoder.finish();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.printStackTrace(exPrinter);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e.printStackTrace(exPrinter);
 		} finally {
 			NIOUtils.closeQuietly(out);
 		}
@@ -96,15 +96,14 @@ public class VideoProcess {
 					}
 					else {
 						fileList.add(null);
-						exFilePrinter.println("File " + MidiHandler.NOTE_TABLE[i] + " is not found!");
+						exPrinter.println(MidiHandler.NOTE_TABLE[i] + ".mp4 is not found");
 					}
 				} else {
 					fileList.add(null);
 				}
 			}
 			catch(Exception e) {
-				fileList.add(null); 
-				e.printStackTrace(exFilePrinter);
+				e.printStackTrace(exPrinter);
 			}
 			frameList.add(null);
 		}
@@ -144,7 +143,7 @@ public class VideoProcess {
 			Runtime.getRuntime().gc();
 		}
 		catch(Exception e) {
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 		}
 	}
 	
@@ -159,8 +158,7 @@ public class VideoProcess {
 	        return resized;
 		}
 		catch (Exception e){
-			System.out.println("Resize error");
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 			return null;
 		}
 	}
@@ -211,7 +209,7 @@ public class VideoProcess {
 			return NOT_FIND;
 		}
 		catch (Exception e) {
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 			return NOT_FIND;
 		}
 	}
@@ -243,7 +241,7 @@ public class VideoProcess {
 			return cp;
 		}
 		catch(Exception e){
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 			return null;
 		}
 	}
@@ -258,7 +256,7 @@ public class VideoProcess {
 			return cp;
 		}
 		catch(Exception e) {
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 			return null;
 		}
 	}
@@ -313,13 +311,12 @@ public class VideoProcess {
 					System.out.println("output frame " + frame + " combine success");
 				}
 				catch(Exception e) {
-					System.out.println(e.toString());
-					exFilePrinter.println(e);
+					e.printStackTrace(exPrinter);
 				}
 			}
 		}
 		catch(Exception e) {
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 		}
 	}
 	
@@ -330,10 +327,10 @@ public class VideoProcess {
 			// Finalize the encoding, i.e. clear the buffers, write the header, etc.
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace(exFilePrinter);
+			e.printStackTrace(exPrinter);
 		}
 	}
 	
@@ -367,13 +364,13 @@ public class VideoProcess {
 			hold.clear();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace(exPrinter);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace(exPrinter);
 			} catch (JCodecException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace(exPrinter);
 			};
 		}
 	}

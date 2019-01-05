@@ -25,7 +25,7 @@ public class MainTest {
 		// Start loading wav files & mixing audio
     	wavTest.start();
     	// Start loading video files & editing video
-    	// videoTest.start();
+    	 videoTest.start();
     	// Merge audio and video
     	mergeTest.start();
     	tmpFolder.deleteTmpFolder();

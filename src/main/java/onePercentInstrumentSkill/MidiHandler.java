@@ -1,5 +1,7 @@
 package onePercentInstrumentSkill;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -23,7 +25,7 @@ public class MidiHandler{
 	    private int velocity = 127;
 	    private int bpm = 60;
 	    
-		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) {
+		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) throws FileNotFoundException {
 			second = (tick*60.0)/(bpm*PPQ);
 			this.tick = tick;
 			this.Channel = Channel;
@@ -63,8 +65,11 @@ public class MidiHandler{
     public static final int SET_TEMPO = 0x51;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public static final String[] NOTE_TABLE = new String[128];
+    private PrintWriter exPrinter;
     
 	public MidiHandler(String path) throws InvalidMidiDataException, IOException {
+		this.exPrinter = new PrintWriter(new File("./tmp/MidiHandler.txt"));
+		
 		for(int i = 0; i <= 127; i++) {
 			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
 			else NOTE_TABLE[i] = null;
@@ -135,11 +140,12 @@ public class MidiHandler{
 	public double getLastSecond() {
 		return lastNoteSecond;
 	}
-	public Note getNote(int index) throws IndexOutOfBoundsException{
+	public Note getNote(int index){
 		try {
 			return notes.get(index);
 		} catch (Exception e){
-			System.err.println(e);
+			e.printStackTrace(exPrinter);
+			exPrinter.flush();
 			return null;
 		}
 	}
