@@ -11,7 +11,7 @@ public class WavMixerTest {
 			midi = new MidiHandler("src/test/resources/Guren_no_Yumiya.midi");
 	    	String outputFilePath = "wavOutput.wav";
 	    	
-	    	WavMixer temp = new WavMixer(midi, outputFilePath, 48000);
+	    	WavMixer temp = new WavMixer("src/test/resources/", midi, outputFilePath, 48000);
 	    	//temp.loadWavFile();
 	    	//temp.walkThroughAllFrame();
 	    	temp.start();

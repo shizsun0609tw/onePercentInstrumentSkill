@@ -11,7 +11,7 @@ public class MainTest {
 		final String outputName = "MergeTest";
 		
 		MidiHandler handlerTest = new MidiHandler(folderName + midiName);
-		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav", 48000);
+		WavMixer wavTest = new WavMixer(folderName, handlerTest, "wavOutput.wav", 48000);
 		VideoProcess videoTest = new VideoProcess(folderName, handlerTest);
 		MergeFiles mergeTest = new MergeFiles("./", outputName);
 		

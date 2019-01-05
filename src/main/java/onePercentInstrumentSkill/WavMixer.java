@@ -10,10 +10,10 @@ public class WavMixer{
     private double duration;
     private int sampleRate;
     private long numFrames;
+    private String inputDir;		// "./" is at "{project path}/onePercentInstrumentSkill/"
+    private MidiHandler midi;
     private WavFile[] wavData = new WavFile[128];
     private double[][][] wavDataBuffer = new double[128][2][];
-    private Boolean[] isKeyPlaying = new Boolean[128];
-    private MidiHandler midi;
     private final static int NOT_FIND = -1;
 
     // inner Class store currently playing note.
@@ -72,7 +72,8 @@ public class WavMixer{
 	}
 	
 	// Constructor
-    public WavMixer(MidiHandler midi, String outputFilePath, int sampleRate){
+    public WavMixer(String inputDit, MidiHandler midi, String outputFilePath, int sampleRate){
+    	this.inputDir = inputDir;
     	this.sampleRate = sampleRate;
     	this.duration = midi.getLastSecond();
         this.numFrames = (long)(duration * sampleRate);
@@ -93,7 +94,7 @@ public class WavMixer{
     }
 
     public void loadWavFile() {
-    	String dirPath = "src/test/resources/";
+    	String dirPath = inputDir;
     	for(int i = 0; i < 128; i++) {
 			if(MidiHandler.NOTE_TABLE[i] != null) {
 	    		try {
