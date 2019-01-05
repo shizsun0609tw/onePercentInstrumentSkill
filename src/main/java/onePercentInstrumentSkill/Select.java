@@ -97,21 +97,10 @@ public class Select extends JPanel implements ActionListener {
             if(filePath != null && folderPath != null) {
                 System.out.println(filePath); // filePath
                 System.out.println(folderPath); // folderPath
-            	try {
-            		// TODO check filePath is midi file &
-            		// TODO check how much C0(etc.).mp4 in folderPath 
-					OnePercentInstrumentSkill.start();
-				} catch (InvalidMidiDataException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace(exPrinter);
-					exPrinter.flush();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace(exPrinter);
-					exPrinter.flush();
-				}
+                
+                Thread myThread = new MainThread();
+                myThread.start();
             }
-
         }
     }
     // run GUI
@@ -123,4 +112,23 @@ public class Select extends JPanel implements ActionListener {
         frame.setSize(new Dimension(750, 270)); // GUI size
         frame.setVisible(true); // keep show
     }
+    
+	
+	private static class MainThread extends Thread{
+		public MainThread(){}
+		
+		@Override
+		public void run() {
+			try {
+				OnePercentInstrumentSkill.start();
+			} catch (InvalidMidiDataException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 }
