@@ -7,6 +7,7 @@ import javax.sound.midi.InvalidMidiDataException;
 public class VideoProcessTest {
 	public static void main(String[] args) {
 		try {
+			System.out.println("hi");
 			MidiHandler handlerTest = new MidiHandler("src/test/resources/Guren_no_Yumiya.midi");
 			VideoProcess processTest = new VideoProcess("src/test/resources/", handlerTest);
 			processTest.start();

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
 import org.jcodec.api.awt.AWTSequenceEncoder;
 import org.jcodec.common.io.FileChannelWrapper;
 import org.jcodec.common.io.NIOUtils;
@@ -89,7 +90,9 @@ public class VideoProcess {
 			try {
 				if(exist(MidiHandler.NOTE_TABLE[i])) {
 					File temp = new File(myFolderPath + "/" + MidiHandler.NOTE_TABLE[i] + ".mp4");
-					if(temp.exists()) fileList.add(temp);
+					if(temp.exists()) {
+						fileList.add(temp);
+					}
 					else {
 						fileList.add(null);
 						exFilePrinter.println("File " + MidiHandler.NOTE_TABLE[i] + " is not found!");
@@ -102,40 +105,41 @@ public class VideoProcess {
 				fileList.add(null); 
 				e.printStackTrace(exFilePrinter);
 			}
+			frameList.add(null);
 		}
 	}
 	
 	// get frame from every file to save in frameList
 	private void getFrame() {
-		FrameGrab grab;
 		
 		try {
-			ArrayList<BufferedImage> hold = new ArrayList<BufferedImage>();
-			Picture picture;
+			int cores = Runtime.getRuntime().availableProcessors();
+			ArrayList<Thread> t = new ArrayList<Thread>(); 
+			
+			for(int i = 0; i < cores; i++) t.add(new Thread());
 			
 			for(int i = 0; i < fileList.size(); i++) {
 				if(exist(fileList.get(i))) {
-					grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileList.get(i)));
-					
-					int count = 0;
-					while(null !=  (picture = grab.getNativeFrame())) {
-						hold.add(resize(AWTUtil.toBufferedImage(picture)));
-						count ++;
-						System.out.println("-------" + fileList.get(i).getName() + " frame " + count  + " grab success!");
+					int label = 0;
+					for(int j = 0; j < t.size(); j++) {
+						if(!t.get(j).isAlive()) {
+							t.set(j, new Thread(new MyRunnable(i)));
+							label = 1;
+							t.get(j).start();
+							break;
+						}
 					}
-					
-					frameList.add(deepCopy(hold));
-					System.out.println("-------" + fileList.get(i).getName() + " grab success!");
-					hold.clear();
-				}else {
-					frameList.add(null);
+					if(label == 0) t.get(0).join();
 				}
+			}
+			
+			for(int i = 0; i < t.size(); i++) {
+				t.get(i).join();
 			}
 			
 			Runtime.getRuntime().gc();
 		}
 		catch(Exception e) {
-			frameList.add(null);
 			e.printStackTrace(exFilePrinter);
 		}
 	}
@@ -333,4 +337,41 @@ public class VideoProcess {
 	private boolean exist(Object obj) {
 		return (obj != null ? true : false); 
 	}
+	
+	// MultiThread grab
+	private class MyRunnable implements Runnable { 
+		private int i;
+		public MyRunnable(int index){
+			this.i = index;
+		}
+		
+		public void run() {
+			try {
+				FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileList.get(i)));
+				ArrayList<BufferedImage> hold = new ArrayList<BufferedImage>();
+				Picture picture;
+				
+				int count = 0;
+				while(null !=  (picture = grab.getNativeFrame())) {
+					hold.add(resize(AWTUtil.toBufferedImage(picture)));
+					count ++;
+					System.out.println("-------" + fileList.get(i).getName() + " frame " + count  + " grab success!");
+				}
+				
+				frameList.set(i, deepCopy(hold));
+				System.out.println("-------" + fileList.get(i).getName() + " grab success!");
+			hold.clear();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JCodecException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			};
+		}
+	}
+	
 }
