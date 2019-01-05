@@ -16,26 +16,26 @@ public class OnePercentInstrumentSkill {
 	
 	public static void start(String midiPath, String folderPath, String backgroundPath) throws InvalidMidiDataException, IOException {
 
-		final String outputName = "MergeTest";
+		final String outputName = "Output";
 		
 		// This will make tmp folder @./tmp/ directly.
 		
-		MidiHandler handlerTest = new MidiHandler(midiPath);
-		SplitFiles splitTest = new SplitFiles(folderPath, handlerTest);
-		// Warning: If we don't run wavTest.start(), the wavOutput.wav will be a blank file.
+		MidiHandler handler = new MidiHandler(midiPath);
+		SplitFiles split = new SplitFiles(folderPath, handler);
+		// Warning: If we don't run wav.start(), the wavOutput.wav will be a blank file.
 		// because "new WavMixer(args...)" will always cover the exist file.
-		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav", 48000);
-		VideoProcess videoTest = new VideoProcess(folderPath, handlerTest, backgroundPath);
-		MergeFiles mergeTest = new MergeFiles("./", outputName);
+		WavMixer wav = new WavMixer(handler, "wavOutput.wav", 48000);
+		VideoProcess video = new VideoProcess(folderPath, handler, backgroundPath);
+		MergeFiles merge = new MergeFiles("./", outputName);
 		
 		// Start split mp4 file to wav, store at ./tmp/
-		splitTest.start();
+		split.start();
 		// Start loading wav files & mixing audio
-    	wavTest.start();
+    	wav.start();
     	// Start loading video files & editing video
-    	videoTest.start();
+    	video.start();
     	// Merge audio and video
-    	mergeTest.start();
+    	merge.start();
     	tmpFolder.deleteTmpFolder();
 	}
 	
