@@ -168,7 +168,7 @@ public class VideoProcess {
 	//resize background image
 	private BufferedImage resizeBackground(BufferedImage image) {
 		Image tmp = image.getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
-		BufferedImage resized = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage resized = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = resized.createGraphics();
         g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
@@ -180,7 +180,7 @@ public class VideoProcess {
 	private BufferedImage resize(BufferedImage image) {
 		try {
 			Image tmp = image.getScaledInstance(WIDTH / COL, HEIGHT / ROW, Image.SCALE_SMOOTH);
-			BufferedImage resized = new BufferedImage(WIDTH / COL, HEIGHT / ROW, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage resized = new BufferedImage(WIDTH / COL, HEIGHT / ROW, BufferedImage.TYPE_INT_RGB);
 	        Graphics2D g2d = resized.createGraphics();
 	        g2d.drawImage(tmp, 0, 0, null);
 	        g2d.dispose();
