@@ -12,6 +12,8 @@ public class MainTest {
 		
 		MidiHandler handlerTest = new MidiHandler(folderName + midiName);
 		SplitFiles splitTest = new SplitFiles(folderName, handlerTest);
+		// Warning: If we don't run wavTest.start(), the wavOutput.wav will be a blank file.
+		// because "new WavMixer(args...)" will always cover the exist file.
 		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav", 48000);
 		VideoProcess videoTest = new VideoProcess(folderName, handlerTest);
 		MergeFiles mergeTest = new MergeFiles("./", outputName);
@@ -22,7 +24,7 @@ public class MainTest {
 		// Start loading wav files & mixing audio
     	wavTest.start();
     	// Start loading video files & editing video
-    	videoTest.start();
+    	// videoTest.start();
     	// Merge audio and video
     	mergeTest.start();
 	}
