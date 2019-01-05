@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.tools.ant.Main;
+
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFmpegUtils;
@@ -41,14 +43,21 @@ public class SplitFiles {
 		Select.setMessage(System.getProperty("os.name"));
 		FFmpeg ffmpeg = null;
 		FFprobe ffprobe = null;
-		if("Mac OS X".equals(System.getProperty("os.name"))) {
-			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg");
-			ffprobe = new FFprobe("./ffmpeg/ffprobe");
-			Select.setMessage("Find ffmpeg & ffprobe success.");
-		}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
-			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg.exe");
-			ffprobe = new FFprobe("./ffmpeg/ffprobe.exe");
-			Select.setMessage("Find ffmpeg & ffprobe success.");
+		Path currentPath = Paths.get("");
+
+		try {
+			if("Mac OS X".equals(System.getProperty("os.name"))) {
+				ffmpeg = new FFmpeg(currentPath.toAbsolutePath().toString() + "/ffmpeg/ffmpeg");
+				ffprobe = new FFprobe(currentPath.toAbsolutePath().toString() + "/ffmpeg/ffprobe");
+				Select.setMessage("Find ffmpeg & ffprobe success.");
+			}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
+				ffmpeg = new FFmpeg(currentPath.toAbsolutePath().toString() + "/ffmpeg/ffmpeg.exe");
+				ffprobe = new FFprobe(currentPath.toAbsolutePath().toString() + "/ffmpeg/ffprobe.exe");
+				Select.setMessage("Find ffmpeg & ffprobe success.");
+			}
+		}
+		catch (Exception e) {
+			Select.setMessage(e.toString());
 		}
 		// if folderPath exists
 		File folder = new File(folderPath);
