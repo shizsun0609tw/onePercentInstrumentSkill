@@ -72,14 +72,16 @@ public class WavMixer{
 	}
 	
 	// Constructor
-    public WavMixer(String inputDit, MidiHandler midi, String outputFilePath, int sampleRate){
-    	this.inputDir = inputDir;
+    public WavMixer(MidiHandler midi, String outputFileName, int sampleRate){
+    	this.inputDir = "./tmp/";
     	this.sampleRate = sampleRate;
     	this.duration = midi.getLastSecond();
         this.numFrames = (long)(duration * sampleRate);
         this.midi = midi;
+        
+        String outputDir = "./tmp/";
     	try {
-			outputWavFile = WavFile.newWavFile(new File(outputFilePath), 2, numFrames, 16, sampleRate);
+			outputWavFile = WavFile.newWavFile(new File(outputDir+outputFileName), 2, numFrames, 16, sampleRate);
 		} catch (IOException e1) {
 			System.err.println("IOException when opening outputWavFile.");
 			e1.printStackTrace();

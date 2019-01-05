@@ -9,11 +9,10 @@ public class WavMixerTest {
     	MidiHandler midi;
 		try {
 			midi = new MidiHandler("src/test/resources/Guren_no_Yumiya.midi");
-	    	String outputFilePath = "wavOutput.wav";
+	    	String outputFileName = "wavOutput.wav";
+	    	// it will output to ./tmp/outputFileName
+	    	WavMixer temp = new WavMixer(midi, outputFileName, 48000);
 	    	
-	    	WavMixer temp = new WavMixer("src/test/resources/", midi, outputFilePath, 48000);
-	    	//temp.loadWavFile();
-	    	//temp.walkThroughAllFrame();
 	    	temp.start();
 		} catch (InvalidMidiDataException e) {
 			// TODO Auto-generated catch block
