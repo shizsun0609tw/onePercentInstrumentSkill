@@ -50,7 +50,7 @@ public class VideoProcess {
 		if(exist(backgroundName)) {
 			File temp = new File(backgroundName);
 			if(temp.exists()) {
-				background = ImageIO.read(temp);
+				background = resizeBackground(ImageIO.read(temp));
 			}
 			else {
 				background = null;
@@ -164,6 +164,17 @@ public class VideoProcess {
 			e.printStackTrace(exPrinter);
 		}
 	}
+	
+	//resize background image
+	private BufferedImage resizeBackground(BufferedImage image) {
+		Image tmp = image.getScaledInstance(WIDTH, HEIGHT, Image.SCALE_SMOOTH);
+		BufferedImage resized = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        return resized;
+	}
+	
 	
 	// resize image to correct size
 	private BufferedImage resize(BufferedImage image) {
