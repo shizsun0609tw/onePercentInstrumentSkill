@@ -70,7 +70,7 @@ public class MergeFiles {
 				    .done();
 
 				FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-				final FFmpegProbeResult in = ffprobe.probe("mp4Output.mp4");
+				final FFmpegProbeResult in = ffprobe.probe(inputDir+"mp4Output.mp4");
 
 				FFmpegJob job = executor.createJob(builder, new ProgressListener() {
 
