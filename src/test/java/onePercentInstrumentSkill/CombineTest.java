@@ -17,7 +17,7 @@ public class CombineTest {
 		// Warning: If we don't run wavTest.start(), the wavOutput.wav will be a blank file.
 		// because "new WavMixer(args...)" will always cover the exist file.
 		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav", 48000);
-		VideoProcess videoTest = new VideoProcess(folderName, handlerTest);
+		VideoProcess videoTest = new VideoProcess(folderName, handlerTest, "src/test/resources/backGroundTest.jpg");
 		MergeFiles mergeTest = new MergeFiles("./", outputName);
 		
 		// Start split mp4 file to wav, store at ./tmp/

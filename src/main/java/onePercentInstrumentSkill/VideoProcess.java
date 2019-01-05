@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import javax.imageio.ImageIO;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,20 +31,27 @@ public class VideoProcess {
 	private final MidiHandler myMidi;
 	private final Path myFolderPath;							// input folder
 	private final Random rnd = new Random();
+	private final BufferedImage backGround;
 	private final static String outputPath = "./tmp/";			// output folder
 	private final static String fileName = "mp4Output";
 	private final static int WIDTH = 960;						// video width
-	private final static int HEIGHT = 720;						// video height
+	private final static int HEIGHT = 540;						// video height
 	private final static int ROW = 3;							// num of rows
 	private final static int COL = 3;							// num of cols
 	private final static int FPS = 60;							// frame per second
 	private final static int NOT_FIND = -1;
 	
 	// constructor
-	public VideoProcess(String folderPath, MidiHandler midiHandler) throws FileNotFoundException{
+	public VideoProcess(String folderPath, MidiHandler midiHandler, String backGroundName) throws IOException{
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
 		exPrinter = new PrintWriter(new File(outputPath + "VideoProcessException.txt"));
+		File temp = new File(backGroundName);
+		if(temp.exists()) {
+			backGround = ImageIO.read(temp);
+		}else {
+			backGround = null;
+		}
 		
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
@@ -91,6 +99,7 @@ public class VideoProcess {
 			try {
 				if(exist(NoteTable.NOTE_TABLE[i])) {
 					File temp = new File(myFolderPath + "/" + NoteTable.NOTE_TABLE[i] + ".mp4");
+					
 					if(temp.exists()) {
 						fileList.add(temp);
 					}
@@ -121,6 +130,7 @@ public class VideoProcess {
 			for(int i = 0; i < fileList.size(); i++) {
 				if(exist(fileList.get(i))) {
 					int label = 0;
+
 					for(int j = 0; j < t.size(); j++) {
 						if(!t.get(j).isAlive()) {
 							t.set(j, new Thread(new MyRunnable(i)));
@@ -295,17 +305,24 @@ public class VideoProcess {
 				// combine image by graphic to generate output image list
 				BufferedImage temp = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 				
+				Graphics2D g = temp.createGraphics();
+				
+				if(exist(backGround)) {
+					g.drawImage(backGround, 0, 0, null);
+				}	
 				for(int play = 0; play < playList.size(); play++) {
 					noteKey = playList.get(play).getKey();
 					notePos = playList.get(play).getPos();
 					noteFrame = playList.get(play).getFrame();
 					
-					Graphics2D g = temp.createGraphics();
 					g.drawImage(frameList.get(noteKey).get(noteFrame), 
 									(notePos % COL) * (WIDTH / COL), (notePos / ROW) * (HEIGHT / ROW), null);
-					g.dispose();
 					playList.get(play).nextFrame();
 				}
+				
+				g.dispose();
+				
+				// write image to video
 				try {
 					writeVideo(deepCopy(temp));
 					System.out.println("output frame " + frame + " combine success");
