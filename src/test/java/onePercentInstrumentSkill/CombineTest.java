@@ -6,9 +6,10 @@ import javax.sound.midi.InvalidMidiDataException;
 
 public class CombineTest {
 	public static void main(String[] args) throws InvalidMidiDataException, IOException {
-		final String midiName = "This_Game.midi";
+		final String midiName = "Guren_no_Yumiya.midi";
 		final String folderName = "src/test/resources/";
 		final String outputName = "MergeTest";
+		NoteTable.initNoteTable();
 		
 		// This will make tmp folder @./tmp/ directly.
 		MakeTmpFolder tmpFolder = new MakeTmpFolder();

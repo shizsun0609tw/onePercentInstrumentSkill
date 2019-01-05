@@ -31,7 +31,7 @@ public class VideoProcess {
 	private final MidiHandler myMidi;
 	private final Path myFolderPath;							// input folder
 	private final Random rnd = new Random();
-	private final BufferedImage backGround;
+	private final BufferedImage background;
 	private final static String outputPath = "./tmp/";			// output folder
 	private final static String fileName = "mp4Output";
 	private final static int WIDTH = 960;						// video width
@@ -42,15 +42,15 @@ public class VideoProcess {
 	private final static int NOT_FIND = -1;
 	
 	// constructor
-	public VideoProcess(String folderPath, MidiHandler midiHandler, String backGroundName) throws IOException{
+	public VideoProcess(String folderPath, MidiHandler midiHandler, String backgroundName) throws IOException{
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
 		exPrinter = new PrintWriter(new File(outputPath + "VideoProcessException.txt"));
-		File temp = new File(backGroundName);
+		File temp = new File(backgroundName);
 		if(temp.exists()) {
-			backGround = ImageIO.read(temp);
+			background = ImageIO.read(temp);
 		}else {
-			backGround = null;
+			background = null;
 		}
 		
 		myFolderPath = Paths.get(folderPath);
@@ -307,8 +307,8 @@ public class VideoProcess {
 				
 				Graphics2D g = temp.createGraphics();
 				
-				if(exist(backGround)) {
-					g.drawImage(backGround, 0, 0, null);
+				if(exist(background)) {
+					g.drawImage(background, 0, 0, null);
 				}	
 				for(int play = 0; play < playList.size(); play++) {
 					noteKey = playList.get(play).getKey();
