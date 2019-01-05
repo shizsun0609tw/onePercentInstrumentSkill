@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import javax.sound.midi.InvalidMidiDataException;
 
-public class MainTest {
+public class CombineTest {
 	public static void main(String[] args) throws InvalidMidiDataException, IOException {
 		final String midiName = "This_Game.midi";
 		final String folderName = "src/test/resources/";
