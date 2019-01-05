@@ -9,16 +9,18 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 
 public class Select extends JPanel implements ActionListener {
-    JButton fileButton; // button for select file
-    JButton folderButton; // button for select folder
-    JButton run; // button for run
-    JTextArea fileText; // show file path
-    JTextArea folderText; // show folder path
-    JFileChooser file; // choose file
-    JFileChooser folder; // choose folder
-    private int fontSize = 18; // GUI font size
+    private static JButton fileButton; // button for select file
+    private static JButton folderButton; // button for select folder
+    private static JButton run; // button for run
+    private static JTextArea fileText; // show file path
+    private static JTextArea folderText; // show folder path
+    private static JTextArea runProcess; // process when run
+    private static JFileChooser file; // choose file
+    private static JFileChooser folder; // choose folder
+    private static int fontSize = 18; // GUI font size
     private static String filePath, folderPath; // path for file and folder
     private final PrintWriter exPrinter;
+    private static String message;
     // ctor
     public Select() throws FileNotFoundException {
         super(new BorderLayout());
@@ -41,6 +43,12 @@ public class Select extends JPanel implements ActionListener {
         folderText.setLineWrap(true);
         folderText.setFont(new Font("Microsoft JhengHei", Font.PLAIN, fontSize));
         JScrollPane folderTextPane = new JScrollPane(folderText);
+        // run process text area
+        runProcess = new JTextArea(25, 60);
+        runProcess.setMargin(new Insets(5, 5, 5, 5));
+        runProcess.setEditable(false);
+        runProcess.setLineWrap(true);
+        JScrollPane processTextPane = new JScrollPane(runProcess);
         // new button for select file
         fileButton = new JButton("Select midi file");
         fileButton.setFont(new Font("Microsoft JhengHei", Font.PLAIN, fontSize));
@@ -65,8 +73,31 @@ public class Select extends JPanel implements ActionListener {
         JPanel showPanel = new JPanel();
         showPanel.add(filePanel);
         showPanel.add(folderPanel);
+        showPanel.add(processTextPane);
         showPanel.add(runButtonPanel);
         add(showPanel, BorderLayout.CENTER);
+    }
+    // check file
+    private Boolean fileCheck() {
+    	if (filePath.length() < 4) return false;
+    	String temp = filePath.substring(filePath.length() - 4);
+    	return (temp.equals("midi") || temp.equals(".mid"));
+    }
+    // check folder
+    private int folderCheck() {
+    	int counter = 0;
+    	for(int i = 0; i < NoteTable.NOTE_TABLE.length; i++) {
+    		File temp = new File(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
+    		if(temp.exists() && temp.isFile()) {
+    			counter++;
+    		}
+    	}
+    	return counter;
+    }
+    // get message
+    public static void setMessage(String msg) {
+    	message = msg;
+    	runProcess.append(message);
     }
     // wait event and do something
     public void actionPerformed(ActionEvent e) {
@@ -75,7 +106,13 @@ public class Select extends JPanel implements ActionListener {
             int returnValue = file.showOpenDialog(this);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 filePath = file.getSelectedFile().toString(); // assign file path
-                fileText.setText(filePath);
+                if (fileCheck()) fileText.setText(filePath);
+                else {
+                	filePath = null;
+                	JLabel label = new JLabel("Please select correct file.");
+                	label.setFont(new Font("Microsoft JhengHei", Font.PLAIN, fontSize));
+                	JOptionPane.showMessageDialog(null,  label, "Message", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
             fileText.setCaretPosition(fileText.getDocument().getLength());
         }
@@ -85,6 +122,10 @@ public class Select extends JPanel implements ActionListener {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 folderPath = folder.getSelectedFile().toString(); // assign folder path
                 folderText.setText(folderPath);
+                int number = folderCheck();
+                JLabel label = new JLabel("This folder has " + number + " available videos.");
+                label.setFont(new Font("Microsoft JhengHei", Font.PLAIN, fontSize));
+                JOptionPane.showMessageDialog(null, label, "Message", JOptionPane.INFORMATION_MESSAGE);
             }
             folderText.setCaretPosition(folderText.getDocument().getLength());
         }
@@ -109,7 +150,7 @@ public class Select extends JPanel implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(this);
         frame.pack();
-        frame.setSize(new Dimension(750, 270)); // GUI size
+        frame.setSize(new Dimension(750, 750)); // GUI size
         frame.setVisible(true); // keep show
     }
     
