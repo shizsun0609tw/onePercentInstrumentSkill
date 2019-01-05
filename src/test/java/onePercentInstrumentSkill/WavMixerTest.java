@@ -12,8 +12,9 @@ public class WavMixerTest {
 	    	String outputFilePath = "wavOutput.wav";
 	    	
 	    	WavMixer temp = new WavMixer(midi, outputFilePath, 48000);
-	    	temp.loadWavFile();
-	    	temp.walkThroughAllFrame();
+	    	//temp.loadWavFile();
+	    	//temp.walkThroughAllFrame();
+	    	temp.start();
 		} catch (InvalidMidiDataException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

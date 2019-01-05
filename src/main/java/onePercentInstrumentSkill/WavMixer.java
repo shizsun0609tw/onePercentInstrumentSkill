@@ -226,5 +226,10 @@ public class WavMixer{
     	System.out.println("Min Volumn: "+minVolumn);
         return;
     }
+    
+    public void start() {
+    	loadWavFile();
+    	walkThroughAllFrame();
+    }
 
 }

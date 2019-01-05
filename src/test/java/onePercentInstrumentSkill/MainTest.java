@@ -15,10 +15,11 @@ public class MainTest {
 		VideoProcess videoTest = new VideoProcess(folderName, handlerTest);
 		MergeFiles mergeTest = new MergeFiles("./", outputName);
 		
-		wavTest.loadWavFile();
-    	wavTest.walkThroughAllFrame();
-    	
+		// Start loading wav files & mixing audio
+    	wavTest.start();
+    	// Start loading video files & editing video
     	videoTest.start();
+    	// Merge audio and video
     	mergeTest.start();
 	}
 }
