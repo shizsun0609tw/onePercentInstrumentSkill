@@ -55,11 +55,11 @@ public class SplitFiles {
 		if(folder.exists() && folder.isDirectory()) {
 			// for all notes' name
 	    	for(int i = 0; i < 128; i++) {
-				if(MidiHandler.NOTE_TABLE[i] != null) {
+				if(NoteTable.NOTE_TABLE[i] != null) {
 	    			// open wav data file
-	    			File tempFile = new File(folderPath+MidiHandler.NOTE_TABLE[i]+".mp4");
+	    			File tempFile = new File(folderPath+NoteTable.NOTE_TABLE[i]+".mp4");
 	    			if(tempFile.exists()) {
-	    				inputFileNames.add(MidiHandler.NOTE_TABLE[i]);
+	    				inputFileNames.add(NoteTable.NOTE_TABLE[i]);
 	    			}
 				}
 	    	}

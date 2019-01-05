@@ -103,10 +103,10 @@ public class WavMixer{
     public void loadWavFile() {
     	String dirPath = inputDir;
     	for(int i = 0; i < 128; i++) {
-			if(MidiHandler.NOTE_TABLE[i] != null) {
+			if(NoteTable.NOTE_TABLE[i] != null) {
 	    		try {
 	    			// open wav data file
-	    			File tempFile = new File(dirPath+MidiHandler.NOTE_TABLE[i]+".wav");
+	    			File tempFile = new File(dirPath+NoteTable.NOTE_TABLE[i]+".wav");
 					wavData[i] = WavFile.openWavFile(tempFile);
 				} catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(exPrinter);

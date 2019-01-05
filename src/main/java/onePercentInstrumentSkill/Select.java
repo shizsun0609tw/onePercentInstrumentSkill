@@ -3,6 +3,8 @@ package onePercentInstrumentSkill;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import javax.sound.midi.InvalidMidiDataException;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
@@ -16,9 +18,11 @@ public class Select extends JPanel implements ActionListener {
     JFileChooser folder; // choose folder
     private int fontSize = 18; // GUI font size
     private static String filePath, folderPath; // path for file and folder
+    private final PrintWriter exPrinter;
     // ctor
-    public Select() {
+    public Select() throws FileNotFoundException {
         super(new BorderLayout());
+        exPrinter = new PrintWriter(new File("./tmp/SelectException.txt"));
         // create chooser
         file = new JFileChooser();
         folder = new JFileChooser();
@@ -93,7 +97,19 @@ public class Select extends JPanel implements ActionListener {
             if(filePath != null && folderPath != null) {
                 System.out.println(filePath); // filePath
                 System.out.println(folderPath); // folderPath
-            	onePercentInstrumentSkill.start();
+            	try {
+            		// TODO check filePath is midi file &
+            		// TODO check how much C0(etc.).mp4 in folderPath 
+					OnePercentInstrumentSkill.start();
+				} catch (InvalidMidiDataException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace(exPrinter);
+					exPrinter.flush();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace(exPrinter);
+					exPrinter.flush();
+				}
             }
 
         }

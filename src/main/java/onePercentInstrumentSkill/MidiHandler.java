@@ -64,16 +64,11 @@ public class MidiHandler{
     public static final int NOTE_OFF = 0x80;
     public static final int SET_TEMPO = 0x51;
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    public static final String[] NOTE_TABLE = new String[128];
     private PrintWriter exPrinter;
     
 	public MidiHandler(String path) throws InvalidMidiDataException, IOException {
 		this.exPrinter = new PrintWriter(new File("./tmp/MidiHandler.txt"));
 		
-		for(int i = 0; i <= 127; i++) {
-			if(i >= 21) NOTE_TABLE[i] = NOTE_NAMES[i%12]+(i/12 - 1);
-			else NOTE_TABLE[i] = null;
-		}
 		Note tempNote = null;
 		Sequence sequence = MidiSystem.getSequence(new File(path));
         int trackNumber = 0;

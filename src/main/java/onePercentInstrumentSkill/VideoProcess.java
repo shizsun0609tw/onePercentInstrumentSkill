@@ -87,16 +87,16 @@ public class VideoProcess {
 	
 	// get file from path
 	private void getVideo() {
-		for(int i = 0; i < MidiHandler.NOTE_TABLE.length; i++) {
+		for(int i = 0; i < NoteTable.NOTE_TABLE.length; i++) {
 			try {
-				if(exist(MidiHandler.NOTE_TABLE[i])) {
-					File temp = new File(myFolderPath + "/" + MidiHandler.NOTE_TABLE[i] + ".mp4");
+				if(exist(NoteTable.NOTE_TABLE[i])) {
+					File temp = new File(myFolderPath + "/" + NoteTable.NOTE_TABLE[i] + ".mp4");
 					if(temp.exists()) {
 						fileList.add(temp);
 					}
 					else {
 						fileList.add(null);
-						exPrinter.println(MidiHandler.NOTE_TABLE[i] + ".mp4 is not found");
+						exPrinter.println(NoteTable.NOTE_TABLE[i] + ".mp4 is not found");
 					}
 				} else {
 					fileList.add(null);
