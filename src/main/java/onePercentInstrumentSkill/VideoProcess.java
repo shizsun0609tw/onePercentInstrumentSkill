@@ -46,12 +46,20 @@ public class VideoProcess {
 		fileList = new ArrayList<File>();
 		frameList = new ArrayList<ArrayList<BufferedImage>>();
 		exPrinter = new PrintWriter(new File(outputPath + "VideoProcessException.txt"));
-		File temp = new File(backgroundName);
-		if(temp.exists()) {
-			background = ImageIO.read(temp);
-		}else {
+		
+		if(exist(backgroundName)) {
+			File temp = new File(backgroundName);
+			if(temp.exists()) {
+				background = ImageIO.read(temp);
+			}
+			else {
+				background = null;
+			}
+		}
+		else {
 			background = null;
 		}
+		
 		
 		myFolderPath = Paths.get(folderPath);
 		myMidi = midiHandler;
@@ -68,7 +76,7 @@ public class VideoProcess {
 		
 		finishEncode();
 		
-		System.out.println("Success!");
+		Select.setMessage("Success!");
 		exPrinter.flush();
 	}
 	
@@ -291,12 +299,12 @@ public class VideoProcess {
 										0,
 										frameList.get(myMidi.getNote(index).getKey()).size()));
 						}
-						System.out.println("playList NOTE " + myMidi.getNote(index).getName() + " turn on at " + frame + " frame!");
+						Select.setMessage("playList NOTE " + myMidi.getNote(index).getName() + " turn on at " + frame + " frame!");
 					// music off
 					}else {															
 						if(find != NOT_FIND) {
 							playList.remove(find);
-							System.out.println("playList NOTE " + myMidi.getNote(index).getName() +  " turn off at " + frame + " frame!");
+							Select.setMessage("playList NOTE " + myMidi.getNote(index).getName() +  " turn off at " + frame + " frame!");
 						}
 					}
 					index++;
@@ -325,7 +333,7 @@ public class VideoProcess {
 				// write image to video
 				try {
 					writeVideo(deepCopy(temp));
-					System.out.println("output frame " + frame + " combine success");
+					Select.setMessage("output frame " + frame + " combine success");
 				}
 				catch(Exception e) {
 					e.printStackTrace(exPrinter);
@@ -373,11 +381,11 @@ public class VideoProcess {
 				while(null !=  (picture = grab.getNativeFrame())) {
 					hold.add(resize(AWTUtil.toBufferedImage(picture)));
 					count ++;
-					System.out.println("-------" + fileList.get(i).getName() + " frame " + count  + " grab success!");
+					Select.setMessage("-------" + fileList.get(i).getName() + " frame " + count  + " grab success!");
 				}
 				
 				frameList.set(i, deepCopy(hold));
-				System.out.println("-------" + fileList.get(i).getName() + " grab success!");
+				Select.setMessage("-------" + fileList.get(i).getName() + " grab success!");
 			hold.clear();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block

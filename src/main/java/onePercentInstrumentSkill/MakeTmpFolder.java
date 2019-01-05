@@ -12,14 +12,14 @@ public class MakeTmpFolder {
 	public MakeTmpFolder() throws FileNotFoundException{		
 		File f = new File("./tmp/");
 		Boolean bool = f.mkdir();
-		System.out.println("Make\t./tmp/\tfolder: " + bool);
+		//Select.setMessage("Make\t./tmp/\tfolder: " + bool);
 		
 		exPrinter = new PrintWriter(new File("./tmp/MakeTmpFolderException.txt"));
 	}
 	public Boolean deleteTmpFolder() {
 		try {
 			FileUtils.deleteDirectory(new File("./tmp/"));
-			System.out.println("Delete\t./tmp/\tfolder: true");
+			Select.setMessage("Delete\t./tmp/\tfolder: true");
 			return true;
 		} catch (IOException e) {
 			exPrinter.println("Delete\t./tmp/\tfolder: false");

@@ -18,7 +18,7 @@ public class Select extends JPanel implements ActionListener {
     private static JFileChooser file; // choose file
     private static JFileChooser folder; // choose folder
     private static int fontSize = 18; // GUI font size
-    private static String filePath, folderPath; // path for file and folder
+    private static String filePath, folderPath, backgroundPath; // path for file and folder
     private final PrintWriter exPrinter;
     private static String message;
     // ctor
@@ -87,9 +87,11 @@ public class Select extends JPanel implements ActionListener {
     private int folderCheck() {
     	int counter = 0;
     	for(int i = 0; i < NoteTable.NOTE_TABLE.length; i++) {
+    		System.out.println(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
     		File temp = new File(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
     		if(temp.exists() && temp.isFile()) {
     			counter++;
+    			System.out.println(NoteTable.NOTE_TABLE[i]);
     		}
     	}
     	return counter;
@@ -97,7 +99,7 @@ public class Select extends JPanel implements ActionListener {
     // get message
     public static void setMessage(String msg) {
     	message = msg;
-    	runProcess.append(message);
+    	runProcess.append(message+"\n");
     }
     // wait event and do something
     public void actionPerformed(ActionEvent e) {
@@ -120,7 +122,7 @@ public class Select extends JPanel implements ActionListener {
         if (e.getSource() == folderButton) {
             int returnValue = folder.showOpenDialog(this);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                folderPath = folder.getSelectedFile().toString(); // assign folder path
+                folderPath = folder.getSelectedFile().toString()+"/"; // assign folder path
                 folderText.setText(folderPath);
                 int number = folderCheck();
                 JLabel label = new JLabel("This folder has " + number + " available videos.");
@@ -136,8 +138,8 @@ public class Select extends JPanel implements ActionListener {
             JOptionPane.showMessageDialog(null, label, "ALERT", JOptionPane.WARNING_MESSAGE);
             // TODO
             if(filePath != null && folderPath != null) {
-                System.out.println(filePath); // filePath
-                System.out.println(folderPath); // folderPath
+                setMessage(filePath); // filePath
+                setMessage(folderPath); // folderPath
                 
                 Thread myThread = new MainThread();
                 myThread.start();
@@ -161,7 +163,7 @@ public class Select extends JPanel implements ActionListener {
 		@Override
 		public void run() {
 			try {
-				OnePercentInstrumentSkill.start();
+				OnePercentInstrumentSkill.start(filePath, folderPath, backgroundPath);
 			} catch (InvalidMidiDataException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

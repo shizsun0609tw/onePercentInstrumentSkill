@@ -40,22 +40,22 @@ public class MergeFiles {
 	
 	// merge wav and mp4
 	private void mergeFiles() throws IOException {
-		System.out.println(System.getProperty("os.name"));
+		Select.setMessage(System.getProperty("os.name"));
 		FFmpeg ffmpeg = null;
 		FFprobe ffprobe = null;
 		if("Mac OS X".equals(System.getProperty("os.name"))) {
 			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg");
 			ffprobe = new FFprobe("./ffmpeg/ffprobe");
-			System.out.println("Find ffmpeg & ffprobe success.");
+			Select.setMessage("Find ffmpeg & ffprobe success.");
 		}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
 			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg.exe");
 			ffprobe = new FFprobe("./ffmpeg/ffprobe.exe");
-			System.out.println("Find ffmpeg & ffprobe success.");
+			Select.setMessage("Find ffmpeg & ffprobe success.");
 		}
 
 		
 		Path path = Paths.get(".");
-		System.out.println(path.normalize().toAbsolutePath());	
+		Select.setMessage(path.normalize().toAbsolutePath().toString());	
 		
 		FFmpegBuilder builder = new FFmpegBuilder()
 				  .addInput(inputDir+"mp4Output.mp4")     // Filename, or a FFmpegProbeResult
@@ -79,7 +79,7 @@ public class MergeFiles {
 			public void progress(Progress progress) {
 				double percentage = progress.out_time_ns / duration_ns;
 					// Print out interesting information about the progress
-				System.out.println(String.format(
+				Select.setMessage(String.format(
 						"[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
 						percentage * 100,
 						progress.status,
@@ -92,6 +92,6 @@ public class MergeFiles {
 
 		});
 		job.run();
-		System.out.println("Done!");
+		Select.setMessage("Done!");
 	}
 }

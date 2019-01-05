@@ -93,8 +93,8 @@ public class MidiHandler{
         
         for (Track track :  sequence.getTracks()) {
             trackNumber++;
-            //System.out.println("Track " + trackNumber + ": size = " + track.size());
-            //System.out.println();
+            //Select.setMessage("Track " + trackNumber + ": size = " + track.size());
+            //Select.setMessage();
             for (int i=0; i < track.size(); i++) { 
                 MidiEvent event = track.get(i);
                 //System.out.print("@" + event.getTick() + " ");
@@ -110,24 +110,24 @@ public class MidiHandler{
                         String noteName = NOTE_NAMES[note];
                         int velocity = sm.getData2();
                         if(sm.getCommand() == NOTE_ON) {
-                        	// System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
+                        	// Select.setMessage("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), true, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         }
                         else if (sm.getCommand() == NOTE_OFF) {
-                        	// System.out.println("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
+                        	// Select.setMessage("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
                         	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), false, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         } 
                         notes.add(tempNote);
                     } else {
-                        //System.out.println("Command:" + sm.getCommand());
+                        //Select.setMessage("Command:" + sm.getCommand());
                     }
                 } else {
-                    //System.out.println("Other message: " + message.getClass());
+                    //Select.setMessage("Other message: " + message.getClass());
                 }   
             }
-            //System.out.println();
+            //Select.setMessage();
         }
         lastNoteSecond = lastNote.getSecond();
         size = notes.size();

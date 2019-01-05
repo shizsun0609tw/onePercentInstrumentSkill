@@ -124,11 +124,11 @@ public class WavMixer{
 				// read wav file to each Buffer
 				if(null != wavData[i]) {
 					try {
-						System.out.println(i);
+						Select.setMessage(String.format("%d", i));
 						wavDataBuffer[i][0] = new double[(int)wavData[i].getNumFrames()];
 						wavDataBuffer[i][1] = new double[(int)wavData[i].getNumFrames()];
 						wavData[i].readFrames(wavDataBuffer[i], (int)wavData[i].getNumFrames());
-						System.out.println(i);
+						Select.setMessage(String.format("%d", i));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace(exPrinter);
@@ -172,14 +172,14 @@ public class WavMixer{
 	    							wavData[midi.getNote(index).getKey()].getNumFrames(),
 	    							midi.getNote(index).getVelocity()));
 	    				}
-	    				System.out.println("playList NOTE " + midi.getNote(index).getName() + " turn on at " + frame + " frame!");
+	    				Select.setMessage("playList NOTE " + midi.getNote(index).getName() + " turn on at " + frame + " frame!");
 	    			}
 	    			// if key == off or key does note exist
 	    			else {
 	    				// if the note does not exist
 	    				if(find != NOT_FIND) {
 	    					//playList.remove(find);
-	    					System.out.println("playList NOTE " + midi.getNote(index).getName() +  " turn off at " + frame + " frame!");
+	    					Select.setMessage("playList NOTE " + midi.getNote(index).getName() +  " turn off at " + frame + " frame!");
 	    				}
 	    			}
 	    			index++;
@@ -236,10 +236,10 @@ public class WavMixer{
 	    	}
     	}
     	else {
-    		System.out.println("WavMixer Error: Output File haven't been open!");
+    		Select.setMessage("WavMixer Error: Output File haven't been open!");
     	}
-    	System.out.println("Max Volumn: "+maxVolumn);
-    	System.out.println("Min Volumn: "+minVolumn);
+    	Select.setMessage("Max Volumn: "+maxVolumn);
+    	Select.setMessage("Min Volumn: "+minVolumn);
         return;
     }
     

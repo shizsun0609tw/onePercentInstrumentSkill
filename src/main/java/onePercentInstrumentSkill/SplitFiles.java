@@ -38,17 +38,17 @@ public class SplitFiles {
 	// merge wav and mp4
 	private void splitFiles() throws IOException {
 		int counter = 0;
-		System.out.println(System.getProperty("os.name"));
+		Select.setMessage(System.getProperty("os.name"));
 		FFmpeg ffmpeg = null;
 		FFprobe ffprobe = null;
 		if("Mac OS X".equals(System.getProperty("os.name"))) {
 			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg");
 			ffprobe = new FFprobe("./ffmpeg/ffprobe");
-			System.out.println("Find ffmpeg & ffprobe success.");
+			Select.setMessage("Find ffmpeg & ffprobe success.");
 		}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
 			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg.exe");
 			ffprobe = new FFprobe("./ffmpeg/ffprobe.exe");
-			System.out.println("Find ffmpeg & ffprobe success.");
+			Select.setMessage("Find ffmpeg & ffprobe success.");
 		}
 		// if folderPath exists
 		File folder = new File(folderPath);
@@ -91,7 +91,7 @@ public class SplitFiles {
 					double percentage = progress.out_time_ns / duration_ns;
 	
 					// Print out interesting information about the progress
-					System.out.println(String.format(
+					Select.setMessage(String.format(
 						"[%.0f%%] status:%s frame:%d time:%s ms fps:%.0f speed:%.2fx",
 						percentage * 100,
 						progress.status,
@@ -103,8 +103,8 @@ public class SplitFiles {
 				}
 			});
 			job.run();
-			System.out.println("Done!");
+			Select.setMessage("Done!");
 		}
-		System.out.println(counter);
+		Select.setMessage(String.format("%d", counter));
 	}
 }
