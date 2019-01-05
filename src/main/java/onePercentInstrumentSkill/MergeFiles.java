@@ -44,13 +44,13 @@ public class MergeFiles {
 		FFmpeg ffmpeg = null;
 		FFprobe ffprobe = null;
 		if("Mac OS X".equals(System.getProperty("os.name"))) {
-			ffmpeg = new FFmpeg("./ffmpeg_local");
-			ffprobe = new FFprobe("./ffprobe_local");
-			System.out.println("Find ffmpeg/ffprobe success.");
+			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg");
+			ffprobe = new FFprobe("./ffprobe/ffprobe");
+			System.out.println("Find ffmpeg & ffprobe success.");
 		}else if("Windows 10".equals(System.getProperty("os.name")) || "Windows 7".equals(System.getProperty("os.name"))) {
-			ffmpeg = new FFmpeg("./ffmpeg.exe");
-			ffprobe = new FFprobe("./ffprobe.exe");
-			System.out.println("Find ffmpeg/ffprobe success.");
+			ffmpeg = new FFmpeg("./ffmpeg/ffmpeg.exe");
+			ffprobe = new FFprobe("./ffmpeg/ffprobe.exe");
+			System.out.println("Find ffmpeg & ffprobe success.");
 		}
 
 		
