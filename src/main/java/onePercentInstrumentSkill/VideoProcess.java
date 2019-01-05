@@ -129,7 +129,10 @@ public class VideoProcess {
 							break;
 						}
 					}
-					if(label == 0) t.get(0).join();
+					if(label == 0) {
+						i--;
+						t.get(0).join();
+					}
 				}
 			}
 			
