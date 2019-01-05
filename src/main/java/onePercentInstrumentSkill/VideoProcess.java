@@ -30,6 +30,7 @@ public class VideoProcess {
 	private final MidiHandler myMidi;
 	private final Path myFolderPath;							// input folder
 	private final Random rnd = new Random();
+	private final static String outputPath = "./tmp/";			// output folder
 	private final static String fileName = "mp4Output";
 	private final static int WIDTH = 960;						// video width
 	private final static int HEIGHT = 720;						// video height
@@ -65,7 +66,7 @@ public class VideoProcess {
 	
 	// init encode
 	private void initEncode() throws IOException {
-		out = NIOUtils.writableFileChannel(fileName + ".mp4");
+		out = NIOUtils.writableFileChannel(outputPath+fileName + ".mp4");
 		encoder = new AWTSequenceEncoder(out, Rational.R(FPS, 1));
 	}
 	

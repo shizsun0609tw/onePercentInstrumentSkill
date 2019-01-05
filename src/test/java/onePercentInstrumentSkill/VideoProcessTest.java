@@ -8,7 +8,7 @@ public class VideoProcessTest {
 	public static void main(String[] args) {
 		try {
 			System.out.println("hi");
-			MidiHandler handlerTest = new MidiHandler("src/test/resources/Guren_no_Yumiya.midi");
+			MidiHandler handlerTest = new MidiHandler("src/test/resources/This_Game.midi");
 			VideoProcess processTest = new VideoProcess("src/test/resources/", handlerTest);
 			processTest.start();
 		} catch (InvalidMidiDataException e) {
