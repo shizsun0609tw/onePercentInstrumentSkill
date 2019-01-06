@@ -8,7 +8,7 @@ public class WavMixerTest {
     public static void main(String[] args) {
     	MidiHandler midi;
 		try {
-			midi = new MidiHandler("src/test/resources/Guren_no_Yumiya.midi");
+			midi = new MidiHandler("src/test/resources/Brave Shine.mid");
 	    	String outputFileName = "wavOutput.wav";
 	    	// it will output to ./tmp/outputFileName
 	    	WavMixer temp = new WavMixer(midi, outputFileName, 48000);

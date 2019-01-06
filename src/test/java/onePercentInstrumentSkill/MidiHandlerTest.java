@@ -6,13 +6,13 @@ import javax.sound.midi.InvalidMidiDataException;
 
 public class MidiHandlerTest {
 	public static void main(String[] args) throws InvalidMidiDataException, IOException, IndexOutOfBoundsException, NullPointerException {
-		MidiHandler mh = new MidiHandler("src/test/resources/Only_my_railgun.midi");
+		MidiHandler mh = new MidiHandler("src/test/resources/Brave Shine.mid");
 		int maxkey = 0;
 		try {
-			for(int i = 0; i < mh.getSize(); i++) {
-				//System.out.println(i+", Note: "+mh.getNote(i).getName()+", on/off: "+mh.getNote(i).getSwitch()+", @Second: "+mh.getNote(i).getSecond());
-				if(mh.getNote(i).getKey() > maxkey){maxkey = mh.getNote(i).getKey();}
-				//System.out.println(mh.getLastSecond());
+			for(int i = 0; i < 1000; i++) {
+				System.out.println(i+", Note: "+mh.getNote(i).getName()+", on/off: "+mh.getNote(i).getSwitch()+", @Second: "+mh.getNote(i).getSecond()+ ", BPM: "+mh.getNote(i).getBPM()+", Channel: "+mh.getNote(i).getChannel());
+				//if(mh.getNote(i).getKey() > maxkey){maxkey = mh.getNote(i).getKey();}
+				System.out.println(mh.getLastSecond());
 			}
 			System.out.println(mh.getSize());
 

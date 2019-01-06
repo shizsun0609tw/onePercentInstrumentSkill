@@ -6,7 +6,7 @@ import javax.sound.midi.InvalidMidiDataException;
 
 public class CombineTest {
 	public static void main(String[] args) throws InvalidMidiDataException, IOException {
-		final String midiName = "Guren_no_Yumiya.midi";
+		final String midiName = "Brave Shine.mid";
 		final String folderName = "src/test/resources/";
 		final String outputName = "MergeTest";
 		NoteTable.initNoteTable();
@@ -26,7 +26,7 @@ public class CombineTest {
 		// Start loading wav files & mixing audio
     	wavTest.start();
     	// Start loading video files & editing video
-    	 videoTest.start();
+    	videoTest.start();
     	// Merge audio and video
     	mergeTest.start();
     	tmpFolder.deleteTmpFolder();

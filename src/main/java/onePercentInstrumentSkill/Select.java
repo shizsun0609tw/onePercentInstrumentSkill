@@ -106,7 +106,7 @@ public class Select extends JPanel implements ActionListener {
     private int folderCheck() {
     	int counter = 0;
     	for(int i = 0; i < NoteTable.NOTE_TABLE.length; i++) {
-    		System.out.println(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
+    		Select.setMessage(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
     		File temp = new File(folderPath + NoteTable.NOTE_TABLE[i] + ".mp4");
     		if(temp.exists() && temp.isFile()) {
     			counter++;

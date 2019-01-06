@@ -12,6 +12,10 @@ import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 
 public class MidiHandler{
@@ -25,8 +29,8 @@ public class MidiHandler{
 	    private int velocity = 127;
 	    private int bpm = 60;
 	    
-		public Note(int bpm, long tick, int Channel, Boolean on, String name, int key, int velocity) throws FileNotFoundException {
-			second = (tick*60.0)/(bpm*PPQ);
+		public Note(int bpm, long tick, double second, int Channel, Boolean on, String name, int key, int velocity) throws FileNotFoundException {
+			this.second = second;
 			this.tick = tick;
 			this.Channel = Channel;
 			this.on =on;
@@ -37,6 +41,9 @@ public class MidiHandler{
 		}
 		public double getSecond() {
 			return this.second;
+		}
+		public int getChannel() {
+			return this.Channel;
 		}
 		public long getTick() {
 			return this.tick;
@@ -53,6 +60,9 @@ public class MidiHandler{
 		public int getVelocity() {
 			return this.velocity;
 		}
+		public int getBPM() {
+			return this.bpm;
+		}
 	}
 	private ArrayList<Note> notes = new ArrayList<Note>();
 	private Note lastNote;
@@ -63,6 +73,7 @@ public class MidiHandler{
 	public static final int NOTE_ON = 0x90;
     public static final int NOTE_OFF = 0x80;
     public static final int SET_TEMPO = 0x51;
+    public ArrayList<ImmutablePair<Integer, Integer> > setTempoList = new ArrayList<ImmutablePair<Integer, Integer> >();
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     private PrintWriter exPrinter;
     
@@ -72,8 +83,10 @@ public class MidiHandler{
 		Note tempNote = null;
 		Sequence sequence = MidiSystem.getSequence(new File(path));
         int trackNumber = 0;
+        int tempoIndex = 0;
         PPQ = sequence.getResolution();
-        // find bpm info
+        
+        // find fist bpm info
         Track[] tracks = sequence.getTracks();
         for (int i = 0; i < tracks[0].size(); i++) {
             MidiEvent event = tracks[0].get(i);
@@ -81,27 +94,44 @@ public class MidiHandler{
             if (message instanceof MetaMessage) {
                 MetaMessage mm = (MetaMessage) message;
                 if(mm.getType()==SET_TEMPO){
-                    // now what?
                     byte[] bpmData = mm.getData();
                     int tempo = (bpmData[0] & 0xff) << 16 | (bpmData[1] & 0xff) << 8 | (bpmData[2] & 0xff);
                     bpm = 60000000 / tempo;
                     break;
-                    
                 }
             }
         }
         
-        for (Track track :  sequence.getTracks()) {
+        
+        for (Track track:  sequence.getTracks()) {
             trackNumber++;
-            //Select.setMessage("Track " + trackNumber + ": size = " + track.size());
-            //Select.setMessage();
+
+            double lastSetBPMSecond = 0.0;
+            int lastSetBPMTick = 0;
+            int lastSetBPM = bpm;
             for (int i=0; i < track.size(); i++) { 
-                MidiEvent event = track.get(i);
-                //System.out.print("@" + event.getTick() + " ");
+				MidiEvent event = track.get(i);
+                
+                int tick = (int) event.getTick();
                 MidiMessage message = event.getMessage();
+                
+                // Parsing SET_TEMPO
+                MidiMessage bpmMessage = event.getMessage();
+                if (message instanceof MetaMessage) {
+                    MetaMessage mm = (MetaMessage) bpmMessage;
+                    if(mm.getType()==SET_TEMPO){
+                        byte[] bpmData = mm.getData();
+                        int tempo = (bpmData[0] & 0xff) << 16 | (bpmData[1] & 0xff) << 8 | (bpmData[2] & 0xff);
+                        int tempBPM = 60000000 / tempo;
+                        setTempoList.add(new ImmutablePair<Integer, Integer>(tick, tempBPM));
+                    }
+                }
+                
+                // Parsing Notes
                 if (message instanceof ShortMessage) {
+
                     ShortMessage sm = (ShortMessage) message;
-                    //System.out.print("Channel: " + sm.getChannel() + " ");
+
                     if (sm.getCommand() == NOTE_ON || sm.getCommand() == NOTE_OFF) {
                     	
                         int key = sm.getData1();
@@ -109,25 +139,32 @@ public class MidiHandler{
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
                         int velocity = sm.getData2();
-                        if(sm.getCommand() == NOTE_ON) {
-                        	// Select.setMessage("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity);
-                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), true, noteName + octave, key, velocity);
+                        long currentTick = event.getTick();
+                        
+                        if(tempoIndex < setTempoList.size() && currentTick >= setTempoList.get(tempoIndex).getKey()) {
+                        	bpm = setTempoList.get(tempoIndex).getValue();
+                        	
+                        	lastSetBPMSecond += ((tick-lastSetBPMTick)*60.0)/(lastSetBPM*PPQ);
+                        	lastSetBPMTick = tick;
+                        	lastSetBPM = bpm;
+                        	
+                        	tempoIndex++;
+                        }
+                        	
+						if(sm.getCommand() == NOTE_ON) {
+							double noteSecond = lastSetBPMSecond + ((tick-lastSetBPMTick)*60.0)/(bpm*PPQ);
+                        	tempNote = new Note(bpm, event.getTick(), noteSecond, sm.getChannel(), true, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         }
                         else if (sm.getCommand() == NOTE_OFF) {
-                        	// Select.setMessage("Note off, " + noteName + octave + " key=" + key + " velocity: " + velocity);
-                        	tempNote = new Note(bpm, event.getTick(), sm.getChannel(), false, noteName + octave, key, velocity);
+                        	double noteSecond = lastSetBPMSecond + ((tick-lastSetBPMTick)*60.0)/(bpm*PPQ);
+                        	tempNote = new Note(bpm, event.getTick(), noteSecond, sm.getChannel(), false, noteName + octave, key, velocity);
                         	lastNote = tempNote;
                         } 
                         notes.add(tempNote);
-                    } else {
-                        //Select.setMessage("Command:" + sm.getCommand());
                     }
-                } else {
-                    //Select.setMessage("Other message: " + message.getClass());
-                }   
+                } 
             }
-            //Select.setMessage();
         }
         lastNoteSecond = lastNote.getSecond();
         size = notes.size();
