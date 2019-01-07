@@ -10,6 +10,7 @@ public class WavMixer{
     private double duration;
     private int sampleRate;
     private long numFrames;
+    private String outputFileName;
     private String inputDir;		// "./" is at "{project path}/onePercentInstrumentSkill/"
     private MidiHandler midi;
     private PrintWriter exPrinter;
@@ -74,27 +75,15 @@ public class WavMixer{
 	}
 	
 	// Constructor
-    public WavMixer(MidiHandler midi, String outputFileName, int sampleRate) throws FileNotFoundException{
+    public WavMixer(MidiHandler midi, String outputFileName) throws FileNotFoundException{
     	this.inputDir = "./tmp/";
-    	this.sampleRate = sampleRate;
+    	this.outputFileName = outputFileName;
+    	//this.sampleRate = sampleRate;
     	this.duration = midi.getLastSecond();
-        this.numFrames = (long)(duration * sampleRate);
+        //this.numFrames = (long)(duration * sampleRate);
         this.midi = midi;
         this.exPrinter = new PrintWriter(new File("./tmp/WavMixer.txt"));
         
-        String outputDir = "./tmp/";
-    	try {
-			outputWavFile = WavFile.newWavFile(new File(outputDir+outputFileName), 2, numFrames, 16, sampleRate);
-		} catch (IOException e1) {
-			exPrinter.println("IOException when opening outputWavFile.");
-			e1.printStackTrace(exPrinter);
-			exPrinter.flush();
-		} catch (WavFileException e1) {
-			exPrinter.println("WavFileException when opening outputWavFile.");
-			e1.printStackTrace(exPrinter);
-			exPrinter.flush();
-		}
-
     }    
     public WavFile getWavFile(){
         return this.outputWavFile;
@@ -102,12 +91,18 @@ public class WavMixer{
 
     public void loadWavFile() {
     	String dirPath = inputDir;
+    	Boolean sampleRateIsSetted = false;
     	for(int i = 0; i < 128; i++) {
 			if(NoteTable.NOTE_TABLE[i] != null) {
 	    		try {
 	    			// open wav data file
 	    			File tempFile = new File(dirPath+NoteTable.NOTE_TABLE[i]+".wav");
 					wavData[i] = WavFile.openWavFile(tempFile);
+					if(!sampleRateIsSetted && tempFile.exists()) {
+						this.sampleRate = (int)wavData[i].getSampleRate();
+						this.numFrames = (long)this.duration*this.sampleRate;
+						sampleRateIsSetted = true;
+					}
 				} catch(FileNotFoundException fnfe) {
 					fnfe.printStackTrace(exPrinter);
 					exPrinter.flush();
@@ -124,11 +119,9 @@ public class WavMixer{
 				// read wav file to each Buffer
 				if(null != wavData[i]) {
 					try {
-						Select.setMessage(String.format("%d", i));
 						wavDataBuffer[i][0] = new double[(int)wavData[i].getNumFrames()];
 						wavDataBuffer[i][1] = new double[(int)wavData[i].getNumFrames()];
 						wavData[i].readFrames(wavDataBuffer[i], (int)wavData[i].getNumFrames());
-						Select.setMessage(String.format("%d", i));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace(exPrinter);
@@ -244,7 +237,22 @@ public class WavMixer{
     }
     
     public void start() {
+    	
     	loadWavFile();
+
+        String outputDir = "./tmp/";
+    	try {
+			outputWavFile = WavFile.newWavFile(new File(outputDir+outputFileName), 2, numFrames, 16, sampleRate);
+		} catch (IOException e1) {
+			exPrinter.println("IOException when opening outputWavFile.");
+			e1.printStackTrace(exPrinter);
+			exPrinter.flush();
+		} catch (WavFileException e1) {
+			exPrinter.println("WavFileException when opening outputWavFile.");
+			e1.printStackTrace(exPrinter);
+			exPrinter.flush();
+		}
+
     	walkThroughAllFrame();
     }
 

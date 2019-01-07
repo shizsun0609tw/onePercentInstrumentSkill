@@ -11,7 +11,7 @@ public class WavMixerTest {
 			midi = new MidiHandler("src/test/resources/Brave Shine.mid");
 	    	String outputFileName = "wavOutput.wav";
 	    	// it will output to ./tmp/outputFileName
-	    	WavMixer temp = new WavMixer(midi, outputFileName, 48000);
+	    	WavMixer temp = new WavMixer(midi, outputFileName);
 	    	
 	    	temp.start();
 		} catch (InvalidMidiDataException e) {

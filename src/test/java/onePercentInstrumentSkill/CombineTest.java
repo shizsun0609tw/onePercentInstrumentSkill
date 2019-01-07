@@ -6,8 +6,8 @@ import javax.sound.midi.InvalidMidiDataException;
 
 public class CombineTest {
 	public static void main(String[] args) throws InvalidMidiDataException, IOException {
-		final String midiName = "Brave Shine.mid";
-		final String folderName = "src/test/resources/";
+		final String midiName = "Eromanga Sensei.mid";
+		final String folderName = "/Users/jasperlin1996/Downloads/dataFromIPhone/jasperA0toC8/";
 		final String outputName = "MergeTest";
 		NoteTable.initNoteTable();
 		
@@ -17,7 +17,7 @@ public class CombineTest {
 		SplitFiles splitTest = new SplitFiles(folderName, handlerTest);
 		// Warning: If we don't run wavTest.start(), the wavOutput.wav will be a blank file.
 		// because "new WavMixer(args...)" will always cover the exist file.
-		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav", 48000);
+		WavMixer wavTest = new WavMixer(handlerTest, "wavOutput.wav");
 		VideoProcess videoTest = new VideoProcess(folderName, handlerTest, "src/test/resources/backGroundTest.jpg");
 		MergeFiles mergeTest = new MergeFiles("./", outputName);
 		

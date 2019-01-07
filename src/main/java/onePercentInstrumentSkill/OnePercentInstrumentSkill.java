@@ -24,7 +24,7 @@ public class OnePercentInstrumentSkill {
 		SplitFiles split = new SplitFiles(folderPath, handler);
 		// Warning: If we don't run wav.start(), the wavOutput.wav will be a blank file.
 		// because "new WavMixer(args...)" will always cover the exist file.
-		WavMixer wav = new WavMixer(handler, "wavOutput.wav", 48000);
+		WavMixer wav = new WavMixer(handler, "wavOutput.wav");
 		VideoProcess video = new VideoProcess(folderPath, handler, backgroundPath);
 		MergeFiles merge = new MergeFiles("./", outputName);
 		
