@@ -397,7 +397,7 @@ public class VideoProcess {
 				
 				frameList.set(i, deepCopy(hold));
 				Select.setMessage("-------" + fileList.get(i).getName() + " grab success!");
-			hold.clear();
+				hold.clear();
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace(exPrinter);
@@ -406,6 +406,8 @@ public class VideoProcess {
 				e.printStackTrace(exPrinter);
 			} catch (JCodecException e) {
 				// TODO Auto-generated catch block
+				e.printStackTrace(exPrinter);
+			} catch (Exception e) {
 				e.printStackTrace(exPrinter);
 			};
 		}
