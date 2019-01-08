@@ -40,8 +40,17 @@ public class OnePercentInstrumentSkill {
 	}
 	
 	public static void main(String[] args) throws InvalidMidiDataException, IOException {
+		if(args.length == 0) {
+			try {
+				 Runtime.getRuntime().exec(new String[] {"java", "-Xmx6g", "-jar", "OnePercentInstrumentSkill.jar", "test"});  
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+			System.exit(0);
+		}
 		OnePercentInstrumentSkill opis = new OnePercentInstrumentSkill();
 		Select gui = new Select();
 		gui.GUI();
+		Select.setMessage(String.format("set heap size %d MB", Runtime.getRuntime().maxMemory() / 1024 / 1024));
 	}
 }
