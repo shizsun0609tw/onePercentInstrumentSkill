@@ -9,6 +9,9 @@ https://hackmd.io/xPDsdfzKRA-HJNgUj0_W7A?view
 Github repo link:
 https://github.com/shizsun0609tw/onePercentInstrumentSkill
 
+Demo Video:
+https://www.youtube.com/watch?v=8jOvKez1CcE&list=PL46pmKsFimc4o7ekbqHX9sPkmzK_sO0Nr
+
 1. 使用說明
 	- 若是使用 .jar 直接執行, 則不得更改檔名, 並請至少保留5g ram
 	- 若是使用 .jar 直接執行, 則需將.jar 與 ffmpeg/ 放在同個資料夾下
